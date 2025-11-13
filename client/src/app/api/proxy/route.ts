@@ -48,16 +48,12 @@ async function handler(req: NextRequest) {
 
         if (!hasAccess) {
           console.error(`[${new Date().toISOString()}] Error in authentication process: User not authorized`);
-          const url = req.nextUrl.clone();
-          url.pathname = "/api/auth/signin";
-          return NextResponse.redirect(url);
+          return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/auth/signin`, req.url));
         }
       }
     } catch (error) {
       console.error(`[${new Date().toISOString()}] Error in authentication process: User not authorized`);
-      const url = req.nextUrl.clone();
-      url.pathname = "/api/auth/signin";
-      return NextResponse.redirect(url);
+      return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/auth/signin`, req.url));
     }
   }
 
