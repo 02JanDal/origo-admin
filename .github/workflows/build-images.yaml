@@ -23,6 +23,9 @@ jobs:
       matrix:
         include:
           - directory: client
+            base: ""
+          - directory: client
+            base: "/admin"
           - directory: proxy
           - directory: server
     steps:
@@ -54,6 +57,11 @@ jobs:
         uses: docker/metadata-action@96383f45573cb7f253c731d3b3ab81c87ef81934 # v5.0.0
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}-${{ matrix.directory }}
+          tags: |
+            type=schedule,suffix=${{ matrix.base == '/admin' && '-admin' || '' }}
+            type=ref,event=branch,suffix=${{ matrix.base == '/admin' && '-admin' || '' }}
+            type=ref,event=tag,suffix=${{ matrix.base == '/admin' && '-admin' || '' }}
+            type=ref,event=pr,suffix=${{ matrix.base == '/admin' && '-admin' || '' }}
 
       - name: Build and push Docker image
         id: build-and-push
@@ -66,6 +74,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          # only used by the client, but doesn't hurt the rest
+          build-args: BASE_PATH=${{ matrix.base }}
 
       - name: Sign the published Docker image
         if: ${{ github.event_name != 'pull_request' }}
