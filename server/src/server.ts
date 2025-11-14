@@ -24,6 +24,7 @@ import express from "express";
 import * as bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
+import morgan from "morgan";
 import swaggerDocs from "./swagger";
 
 import {
@@ -55,6 +56,7 @@ const PORT = parseInt(process.env.PORT as string, 10) || 8080;
 
 console.info(`[${new Date().toISOString()}] Listening on port: ${PORT}`);
 const app = express();
+app.use(morgan("tiny"));
 
 console.info(`[${new Date().toISOString()}] Initializing authentication...`);
 
