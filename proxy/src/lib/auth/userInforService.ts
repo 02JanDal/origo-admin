@@ -62,8 +62,8 @@ export class UserInfoService {
     return {
       access_token: accessToken,
       expires_at: Date.now() + expires_in * 1000,
-      claims: data.groups,
-      username: data.sub || data.sub || data.email,
+      groups: data[process.env.PROTECTED_IDP_CLAIM_ROLES ?? "groups"] ?? [],
+      username: data[process.env.PROTECTED_IDP_CLAIM_USERNAME ?? ""] ?? data.sub ?? data.email,
     };
   }
 }

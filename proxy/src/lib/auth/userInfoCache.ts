@@ -5,7 +5,7 @@ declare global {
 export interface UserInfo {
   access_token: string;
   expires_at: number;
-  claims: Record<string, any>;
+  groups: string | string[] | Record<string, any>;
   username: string;
 }
 

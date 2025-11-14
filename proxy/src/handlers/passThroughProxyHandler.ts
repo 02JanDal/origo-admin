@@ -57,7 +57,11 @@ export function createPassthroughProxyHandler(proxyBasePath: string, cacheManage
         return;
       }
 
-      let permissions = userInfo.claims.split(",");
+      const permissions = typeof userInfo.groups === "string"
+          ? userInfo.groups.split(",")
+          : Array.isArray(userInfo.groups)
+              ? userInfo.groups
+              : Object.keys(userInfo.groups);
       permissions.push(userInfo.username);
 
       let hasPermission = false;
