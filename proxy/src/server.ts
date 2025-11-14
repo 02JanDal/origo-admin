@@ -7,6 +7,7 @@ import { access_token } from "./lib/auth/access_token";
 import cors from "cors";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const PROXY_BASE_PATH = process.env.PROXY_BASE_PATH || "/proxy";
 const API_ACCESS_TOKEN = process.env.API_ACCESS_TOKEN!;
 
 const app = express();
+app.use(morgan("tiny"));
 
 app.use(
   cors({
