@@ -22,8 +22,10 @@ app.use(morgan("tiny"));
 
 app.use(
   cors({
-    origin: process.env.AUTH_CLIENT_DOMAIN,
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
+      allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -55,14 +57,6 @@ app.get(`${PROXY_BASE_PATH}/refresh-cache`, async (req, res) => {
     console.error(`[${new Date().toISOString()}] Error refreshing sources:`, error);
     res.status(500).send("Error refreshing sources");
   }
-});
-
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Credentials", "true");
-  res.header("Access-Control-Allow-Origin", process.env.AUTH_CLIENT_DOMAIN);
-  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS,HEAD");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
 });
 
 app.post(`${PROXY_BASE_PATH}/auth/access_token`, access_token, (req, res) => {
