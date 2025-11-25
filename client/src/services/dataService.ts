@@ -2,9 +2,9 @@ import { fetchXmlDataAsJson } from "@/api";
 import { GetWFSCapabilitiesResponse, GetWMSCapabilitiesResponse, WFSLayerData, WMSLayerData } from "@/interfaces";
 import { GetWMTSCapabilitiesResponse, WMTSLayerData } from "@/interfaces/getWMTSCapabilitiesResponse";
 
-export const getWmsData = async (url: string): Promise<GetWMSCapabilitiesResponse> => {
+export const getWmsData = async (url: string, init?: RequestInit): Promise<GetWMSCapabilitiesResponse> => {
   try {
-    const response = await fetchXmlDataAsJson(url);
+    const response = await fetchXmlDataAsJson(url, init);
     return formatWMSResponse(response);
   } catch (error) {
     console.error(`[${new Date().toISOString()}] Error fetching data: ${error}`);
@@ -53,9 +53,9 @@ const extractWMSLayerData = (layer: any): WMSLayerData => {
   };
 };
 
-export const getWfsData = async (url: string): Promise<GetWFSCapabilitiesResponse> => {
+export const getWfsData = async (url: string, init?: RequestInit): Promise<GetWFSCapabilitiesResponse> => {
   try {
-    const response = await fetchXmlDataAsJson(url);
+    const response = await fetchXmlDataAsJson(url, init);
     return formatWFSResponse(response);
   } catch (error) {
     console.error(`[${new Date().toISOString()}] Error fetching data: ${error}`);
@@ -158,9 +158,9 @@ const extractWFSLayerData = (layer: any): WFSLayerData => {
   };
 };
 
-export const getWmtsData = async (url: string): Promise<GetWMTSCapabilitiesResponse> => {
+export const getWmtsData = async (url: string, init?: RequestInit): Promise<GetWMTSCapabilitiesResponse> => {
   try {
-    const response = await fetchXmlDataAsJson(url);
+    const response = await fetchXmlDataAsJson(url, init);
     return formatWMTSResponse(response);
   } catch (error) {
     console.error(`[${new Date().toISOString()}] Error fetching data: ${error}`);
