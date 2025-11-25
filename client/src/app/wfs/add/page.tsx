@@ -2,7 +2,7 @@
 import React from "react";
 import LayerWizard from "@/views/wizard/LayerWizard";
 import { WFSLayerService } from "@/api";
-import { useWFSCapabilities } from '@/hooks/capabilities';
+import { loadWFSCapabilities } from '@/hooks/capabilities';
 import { useWFSDescribeFeatureTypes } from '@/hooks/describeFeatureTypes';
 import { DataRowToWFSLayerDto } from "@/utils/mappers";
 import tableSpec from "@/assets/specifications/tables/wfsTableSpecification.json";
@@ -13,16 +13,15 @@ import { LinkResourceDto } from "@/shared/interfaces/dtos";
 const customOnSearchClick = async (
     selectedSourceId: string,
     sources: LinkResourceDto[],
-    useCapabilities: () => { loadCapabilities: (url: string) => Promise<any> },
+    loadCapabilities: (url: string) => Promise<any>,
     tableSpec: any,
     mapDataToTableFormat: (data: any[], spec: any) => TableData
 ) => {
-    const capabilitiesHook = useCapabilities();
     const describeHook = useWFSDescribeFeatureTypes();
 
     if (selectedSourceId) {
         const selectedSource = sources?.find(source => source.id === selectedSourceId);
-        const response = await capabilitiesHook.loadCapabilities(selectedSource!.url);
+        const response = await loadCapabilities(selectedSource!.url);
         let mappedData = mapDataToTableFormat(response.Layers, tableSpec.specification);
 
         try {
@@ -63,7 +62,7 @@ export default function WFSPage() {
             title="Lägg till WFS"
             serviceType="WFS"
             tableSpec={tableSpec}
-            useCapabilities={useWFSCapabilities}
+            loadCapabilities={loadWFSCapabilities}
             mapDataToTableFormat={mapDataToTableFormat}
             mapperFunction={DataRowToWFSLayerDto}
             layerService={WFSLayerService}

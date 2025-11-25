@@ -40,3 +40,14 @@ Next, you either need to provide your own OIDC-compliant IdP or use the provided
     * `akadmin` assumes you are using Authentik in its default configuration
 17. Run `docker-compose up -d client proxy`
 18. Visit `http://localhost:3000`
+
+## Settings
+
+The various parts of Origo Admin can be configured using environment variables.
+
+_This section is work in progress_
+
+### `AUTHENTICATED_PREFIXES` (Client, optional)
+
+Set this to a comma-separated list of URL prefixes for map services that require authentication. When accessing these
+services, the client will include an `Authorization` header with the same access token as used by Origo Admin itself.

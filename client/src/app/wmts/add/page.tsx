@@ -2,7 +2,7 @@
 import React from "react";
 import LayerWizard from "@/views/wizard/LayerWizard";
 import { WMTSLayerService } from "@/api";
-import { useWMTSCapabilities } from '@/hooks/capabilities';
+import { loadWMTSCapabilities } from '@/hooks/capabilities';
 import { DataRowToWMTSLayerDto } from "@/utils/mappers";
 import tableSpec from "@/assets/specifications/tables/wmtsTableSpecification.json";
 import { mapDataToTableFormat } from "@/utils/mappers/toDataTable";
@@ -13,7 +13,7 @@ export default function WMTSPage() {
             title="Lägg till WMTS"
             serviceType="WMTS"
             tableSpec={tableSpec}
-            useCapabilities={useWMTSCapabilities}
+            loadCapabilities={loadWMTSCapabilities}
             mapDataToTableFormat={mapDataToTableFormat}
             mapperFunction={DataRowToWMTSLayerDto}
             layerService={WMTSLayerService}

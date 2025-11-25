@@ -18,7 +18,7 @@ interface LayerWizardProps {
     title: string;
     serviceType: 'WFS' | 'WMS' | 'WMTS';
     tableSpec: any;
-    useCapabilities: () => { loadCapabilities: (url: string) => Promise<any> };
+    loadCapabilities: (url: string) => Promise<any>;
     mapDataToTableFormat: (data: any[], spec: any) => TableData;
     mapperFunction: (rows: DataRow[], source: LinkResourceDto) => any;
     layerService: {
@@ -27,7 +27,7 @@ interface LayerWizardProps {
     customOnSearchClick?: (
         selectedSourceId: string,
         sources: LinkResourceDto[],
-        useCapabilities: () => { loadCapabilities: (url: string) => Promise<any> },
+        loadCapabilities: (url: string) => Promise<any>,
         tableSpec: any,
         mapDataToTableFormat: (data: any[], spec: any) => TableData
     ) => Promise<TableData>;
@@ -41,7 +41,7 @@ export default function LayerWizard({
     title,
     serviceType,
     tableSpec,
-    useCapabilities,
+    loadCapabilities,
     mapDataToTableFormat,
     mapperFunction,
     layerService,
@@ -98,17 +98,15 @@ export default function LayerWizard({
                 const newTableData = await customOnSearchClick(
                     selectedSourceId,
                     sources,
-                    useCapabilities,
+                    loadCapabilities,
                     tableSpec,
                     mapDataToTableFormat
                 );
                 setTableData(newTableData);
             } else {
-
-                const capabilitiesHook = useCapabilities();
                 if (selectedSourceId) {
                     const selectedSource = sources?.find(source => source.id === selectedSourceId);
-                    const response = await capabilitiesHook.loadCapabilities(selectedSource!.url);
+                    const response = await loadCapabilities(selectedSource!.url);
                     const mappedData = mapDataToTableFormat(response.Layers, tableSpec.specification);
                     setTableData(mappedData);
                 }

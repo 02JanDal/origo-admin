@@ -1,9 +1,9 @@
 // fetchData.ts
 import * as xml2js from "xml2js";
 
-export const fetchXmlDataAsJson = async (url: string): Promise<any> => {
+export const fetchXmlDataAsJson = async (url: string, init?: RequestInit): Promise<any> => {
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, init);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
