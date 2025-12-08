@@ -10,10 +10,12 @@ export class FilterJsonService {
             : Object.keys(userInfo.groups);
     permissions.push(userInfo.username);
 
-    if (json.layers) {
-      json.layers = json.layers.filter((layer: any) => {
-        return permissions.some((p: any) => cacheManager.hasPermission(p, layer.id));
-      });
+    if (process.env.RESTRICT_LAYERS !== "false") {
+      if (json.layers) {
+        json.layers = json.layers.filter((layer: any) => {
+          return permissions.some((p: any) => cacheManager.hasPermission(p, layer.id));
+        });
+      }
     }
 
     if (process.env.RESTRICT_MAPCONTROLS === "true") {
@@ -27,21 +29,23 @@ export class FilterJsonService {
 
     const usedSources = new Set<string>(json.layers.map((layer: any) => layer.source));
 
-    if (json.source) {
-      const filteredSources: { [key: string]: any } = {};
-      for (const key of usedSources) {
-        if (typeof key === "string" && json.source[key]) {
-          const source = json.source[key];
-          if (source.url) {
-            const url = cacheManager.getSourceUrlByName(key);
-            if (url) {
-              source.url = `${proxyUrl}gis/${key}`;
+    if (process.env.REWRITE_SOURCES !== "false") {
+      if (json.source) {
+        const filteredSources: { [key: string]: any } = {};
+        for (const key of usedSources) {
+          if (typeof key === "string" && json.source[key]) {
+            const source = json.source[key];
+            if (source.url) {
+              const url = cacheManager.getSourceUrlByName(key);
+              if (url) {
+                source.url = `${proxyUrl}gis/${key}`;
+              }
             }
+            filteredSources[key] = source;
           }
-          filteredSources[key] = source;
         }
+        json.source = filteredSources;
       }
-      json.source = filteredSources;
     }
 
     const usedStyles = new Set<string>();
