@@ -74,12 +74,7 @@
                 "field": "style",
                 "hide": true,
                 "defaultValue": "Välj stilschema för lagret",
-                "inputType": "stylepicker",
-                "validation": {
-                    "required": true,
-                    "type": "object",
-                    "message": "Stilschema är obligatorisk"
-                }
+                "inputType": "stylepicker"
             },
             {
                 "headerName": "MaxScale",
