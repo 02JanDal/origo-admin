@@ -31,7 +31,7 @@ export function SelectSourceAndLayers({ onDataFromSource, sources, selectedSourc
                 onSelectionChanged={onRowsSelectionChanged}
                 sortingEnabled={true}
                 pagination={true}
-                rowsPerPage={10}
+                rowsPerPage={25}
             ></DetailedDataTable>}
         </div>
     );
