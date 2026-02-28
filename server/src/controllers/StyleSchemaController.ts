@@ -7,13 +7,9 @@ class ExtendedStyleSchemaController extends BaseController<StyleSchemaService> {
     super(service);
   }
   async getByName(req: Request, res: Response): Promise<void> {
-    try {
       const name = req.params.name;
       const items = await (this.service as any).getByName(name);
       res.status(200).json(items);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 }
 

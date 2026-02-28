@@ -10,7 +10,7 @@ const router = createSecureRouter(route);
  * @param {string} id - The map instance ID or name
  * @returns {PublishedMapConfigDto}
  */
-router.get(`/${route}/:id/preview(\.json)?`, (req, res) =>
+router.get(`/${route}/:id/preview{.json}`, (req, res) =>
   controller.getPreview(req, res)
 );
 
@@ -20,9 +20,9 @@ router.get(`/${route}/:id/preview(\.json)?`, (req, res) =>
  * @param {string} name - The map instance name
  * @returns {PublishedMapConfigDto}
  */
-router.get(`/${route}/:name/published/latest(\.json)?`, (req, res) => {
-  controller.getLatestPublished(req, res);
-});
+router.get(`/${route}/:name/published/latest{.json}`, (req, res) =>
+  controller.getLatestPublished(req, res)
+);
 
 /**
  * @route GET /${route}/published/:id

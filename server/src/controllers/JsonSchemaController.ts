@@ -8,46 +8,34 @@ class ExtendedJsonSchemaController extends BaseController<JsonSchemaService> {
   }
 
   async getByName(req: Request, res: Response): Promise<void> {
-    try {
-      const name = req.params.name;
-      const item = await (this.service as any).findByName(name);
-      if (!item) {
-        res.status(404).json({ error: `Schema with name "${name}" not found` });
-        return;
-      }
-      res.status(200).json(item);
-    } catch (error) {
-      this.handleError(res, error);
+    const name = req.params.name;
+    const item = await (this.service as any).findByName(name);
+    if (!item) {
+      res.status(404).json({ error: `Schema with name "${name}" not found` });
+      return;
     }
+    res.status(200).json(item);
   }
 
   async getVisible(req: Request, res: Response): Promise<void> {
-    try {
-      const items = await (this.service as any).findVisible();
-      res.status(200).json(items);
-    } catch (error) {
-      this.handleError(res, error);
-    }
+    const items = await (this.service as any).findVisible();
+    res.status(200).json(items);
   }
 
   async getMenuItems(req: Request, res: Response): Promise<void> {
-    try {
-      const schemas = await (this.service as any).findVisible();
+    const schemas = await (this.service as any).findVisible();
 
-      const menuItems = schemas.map((schema: any, index: number) => ({
-        id: 100 + index,
-        name: schema.title,
-        urlSegment: `/layers/${schema.name}`,
-        type: "item",
-        icon: "DataObject",
-        schemaPath: schema.name,
-        disabled: false,
-      }));
+    const menuItems = schemas.map((schema: any, index: number) => ({
+      id: 100 + index,
+      name: schema.title,
+      urlSegment: `/layers/${schema.name}`,
+      type: "item",
+      icon: "DataObject",
+      schemaPath: schema.name,
+      disabled: false,
+    }));
 
-      res.status(200).json(menuItems);
-    } catch (error) {
-      this.handleError(res, error);
-    }
+    res.status(200).json(menuItems);
   }
 }
 

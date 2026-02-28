@@ -48,6 +48,7 @@ import {
 } from "./routes";
 
 import initializeDatabase from "./database";
+import { ErrorRequestHandler } from "express-serve-static-core";
 
 console.info(`[${new Date().toISOString()}] Starting server...`);
 
@@ -118,6 +119,16 @@ app.use(`${BASE_PATH}`, DashboardRoutes);
 app.use(`${BASE_PATH}`, JsonSchemaRoutes);
 app.use(`${BASE_PATH}/uploads`, express.static(path.resolve(UPLOAD_FOLDER)));
 
+app.use(((err, _req, res, _next) => {
+    if (err instanceof Error) {
+      console.error(`[${new Date().toISOString()}] ${err}`);
+      console.info(err.stack);
+      res.status(500).json({ error: err.message });
+    } else {
+      res.status(500).json({ error: "Ett oväntat fel inträffade" });
+    }
+}) satisfies ErrorRequestHandler)
+
 interface NodeError extends Error {
   code?: string;
 }
@@ -136,6 +147,6 @@ app
         `[${new Date().toISOString()}] Port ${PORT} is already in use.`
       );
     } else {
-      console.error(`[${new Date().toISOString()}] ${err}`);
+      console.error(`[${new Date().toISOString()}] Could not start server: ${err}`);
     }
   });

@@ -14,56 +14,28 @@ class BaseController<T> {
   }
 
   async getById(req: Request, res: Response) {
-    try {
-      const item = await this.service.find(req.params.id);
+      const item = await this.service.find(req.params.id as string);
       res.status(200).json(item);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 
   async getAll(req: Request, res: Response) {
-    try {
       const items = await this.service.findAll();
       res.status(200).json(items);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 
   async create(req: Request, res: Response) {
-    try {
       const item = await this.service.create(req.body);
       res.status(201).json(item);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 
   async update(req: Request, res: Response) {
-    try {
-      const item = await this.service.update(req.params.id, req.body);
+      const item = await this.service.update(req.params.id as string, req.body);
       res.status(200).json(item);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 
   async deleteById(req: Request, res: Response) {
-    try {
-      await this.service.delete(req.params.id);
+      await this.service.delete(req.params.id as string);
       res.status(204).end();
-    } catch (error) {
-      this.handleError(res, error);
-    }
-  }
-  protected handleError(res: Response, error: any) {
-    if (error instanceof Error) {
-      console.error(`[${new Date().toISOString()}] ${error}`);
-      res.status(500).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: "Ett oväntat fel inträffade" });
-    }
   }
 }
 
