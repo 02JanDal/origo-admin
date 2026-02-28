@@ -127,7 +127,7 @@ export class WMSLayerMapper
         renderMode: model.renderMode,
       };
     } catch (error) {
-      console.error(`[${new Date().toISOString()}] ${error}`);
+      console.error(`[${new Date().toISOString()}] WMSLayerMapper.toDto failed: ${error}`);
       return {} as WMSLayerDto;
     }
   }

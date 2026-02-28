@@ -72,7 +72,7 @@ class MediaController {
 
   async getFileByIdOrFilename(req: Request, res: Response) {
     try {
-      const item = await this.service.getFileByIdOrFilename(req.params.id.replace(/^\/|\/$/g, '' ));
+      const item = await this.service.getFileByIdOrFilename((req.params.id  as string).replace(/^\/|\/$/g, '' ));
       res.status(200).json(item);
     } catch (error) {
       this.handleError(res, error);
@@ -85,7 +85,7 @@ class MediaController {
       let createdFiles = [] as MediaDto[];
       try {
         for (const file of multerReq.files) {
-          let createdFile = await this.service.saveFiles([file], req.params.path?.replace(/^\/|\/$/g, '' ));
+          let createdFile = await this.service.saveFiles([file], (req.params.path as string | undefined)?.replace(/^\/|\/$/g, '' ));
           createdFiles.push(createdFile[0]);
         }
         res.status(201).json(createdFiles);
@@ -102,8 +102,8 @@ class MediaController {
   }
 
   async renameFile(req: Request, res: Response) {
-    const currentFilename = req.params.currentName.replace(/^\/|\/$/g, '' );
-    const newFilename = req.params.newName.replace(/^\/|\/$/g, '' );
+    const currentFilename = (req.params.currentName as string).replace(/^\/|\/$/g, '' );
+    const newFilename = (req.params.newName as string).replace(/^\/|\/$/g, '' );
     console.log(`[${new Date().toISOString()}] Renaming file '${currentFilename}' to '${newFilename}'`);
     try {
       const fileRegistration = await this.service.renameFile(currentFilename, newFilename);
@@ -117,7 +117,7 @@ class MediaController {
     const { id } = req.params;
     console.log(`[${new Date().toISOString()}] Deleting media file and registration with id '${id}'`);
     try {
-      let file = await this.service.deleteFile(id);
+      let file = await this.service.deleteFile(id as string);
       res.status(200).json(file);
     } catch (error) {
       this.handleError(res, error);
@@ -135,7 +135,7 @@ class MediaController {
 
   async getFolderByIdOrFolderName(req: Request, res: Response) {
     try {
-      const item = await this.service.getFolderByIdOrFolderName(req.params.id.replace(/^\/|\/$/g, '' ));
+      const item = await this.service.getFolderByIdOrFolderName((req.params.id as string).replace(/^\/|\/$/g, '' ));
       res.status(200).json(item);
     } catch (error) {
       this.handleError(res, error);
@@ -143,7 +143,7 @@ class MediaController {
   }
 
   async getByFolder(req: Request, res: Response) {
-    const trimmedId = req.params.id.replace(/^\/|\/$/g, '' );
+    const trimmedId = (req.params.id as string).replace(/^\/|\/$/g, '' );
     let folder;
     try {
       if (trimmedId.toLowerCase() !== 'root') {
@@ -162,7 +162,7 @@ class MediaController {
   }
 
   async createFolder(req: Request, res: Response) {
-    const folderName = req.params.name.replace(/^\/|\/$/g, '' );
+    const folderName = (req.params.name as string).replace(/^\/|\/$/g, '' );
     if (await this.isPathValid(folderName, 'folder', res)) {
       console.log(`[${new Date().toISOString()}] Creating folder: ${folderName}`);
       try {
@@ -212,8 +212,8 @@ class MediaController {
    * @param res The response object to send results to
    */
   async renameFolder(req: Request, res: Response) {
-    const currentFolderName = req.params.currentName.replace(/^\/|\/$/g, '' );
-    const newFolderName = req.params.newName.replace(/^\/|\/$/g, '' );
+    const currentFolderName = (req.params.currentName as string).replace(/^\/|\/$/g, '' );
+    const newFolderName = (req.params.newName as string).replace(/^\/|\/$/g, '' );
     if (currentFolderName && await this.isPathValid(newFolderName, 'folder', res)) {
       try {
         // Rename the folder itself, which also changes the physical path of its contents
@@ -231,10 +231,10 @@ class MediaController {
   async deleteFolderById(req: Request, res: Response) {
     const folderId = req.params.id;
     try {
-      const contents = await this.service.getByFolder(folderId);
+      const contents = await this.service.getByFolder(folderId as string);
       if (contents?.length === 0) {
         console.log(`[${new Date().toISOString()}] Deleting folder with id '${folderId}'`);
-        const folderRegistration = await this.service.deleteFolder(folderId);
+        const folderRegistration = await this.service.deleteFolder(folderId as string);
         res.status(200).json(folderRegistration);
       } else {
         this.handleError(res, new Error("Folder not empty"));

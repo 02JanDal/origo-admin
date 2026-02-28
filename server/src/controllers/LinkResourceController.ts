@@ -8,21 +8,13 @@ class ExtendedLinkResourceController extends BaseController<LinkResourceService>
   }
 
   async getByName(req: Request, res: Response) {
-    try {
       const resp = await (this.service as any).getByName(req.params.name);
       res.json(resp);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 
   async getByType(req: Request, res: Response) {
-    try {
       const resp = await (this.service as any).findByType(req.params.type);
       res.json(resp);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 }
 

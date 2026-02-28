@@ -108,8 +108,11 @@ class MapInstanceService {
     return response.map((item) => this.publishedMapListItemMapper.toDto(item));
   }
 
-  async getLatestPublished(name: string): Promise<PublishedMapConfigDto> {
+  async getLatestPublished(name: string): Promise<PublishedMapConfigDto | null> {
     let response = await this.publishedRepository.query({ name: name }, { publishedDate: "desc" }, 1);
+    if (response.length === 0) {
+      return null;
+    }
     return this.publishedMapMapper.toDto(response[0]);
   }
   async getPublished(id: string): Promise<PublishedMapConfigDto> {

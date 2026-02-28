@@ -27,9 +27,9 @@ router.get(`/${route}/upload/:id`, (req, res) => controller.getFileByIdOrFilenam
  * @request {multipart/form-data[]} requestBody - The media file(s) to upload
  * @returns {MediaDto[]}
  */
-router.post(`/${route}/upload`, upload.any(), (req, res) => {
-  controller.upload(req, res);
-});
+router.post(`/${route}/upload`, upload.any(), (req, res) =>
+  controller.upload(req, res)
+);
 
 /**
  * @route POST /${route}/upload/:path
@@ -38,9 +38,9 @@ router.post(`/${route}/upload`, upload.any(), (req, res) => {
  * @request {multipart/form-data[]} requestBody - The media file(s) to upload
  * @returns {MediaDto[]}
  */
-router.post(`/${route}/upload/:path`, upload.any(), (req, res) => {
-  controller.upload(req, res);
-});
+router.post(`/${route}/upload/:path`, upload.any(), (req, res) =>
+  controller.upload(req, res)
+);
 
 /**
  * @route PUT /${route}/upload/:currentName/:newName

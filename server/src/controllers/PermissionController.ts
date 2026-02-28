@@ -8,21 +8,13 @@ class ExtendedPermissionController extends BaseController<PermissionService> {
   }
 
   async getByName(req: Request, res: Response) {
-    try {
       const item = await (this.service as any).findByName(req.params.name);
       res.status(200).json(item);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 
   async duplicate(req: Request, res: Response) {
-    try {
       const resp = await (this.service as any).duplicate(req.params.id);
       res.json(resp);
-    } catch (error) {
-      this.handleError(res, error);
-    }
   }
 }
 
