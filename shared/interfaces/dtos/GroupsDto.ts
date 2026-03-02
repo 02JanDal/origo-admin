@@ -1,3 +1,5 @@
+import { KeyValuePair } from "./KeyValuePairDto";
+
 export interface GroupDto {
   id: string;
   name: string;
@@ -5,4 +7,5 @@ export interface GroupDto {
   abstract?: string;
   expanded: boolean;
   groups?: GroupDto[];
+  extendedAttributes?: KeyValuePair[];
 }

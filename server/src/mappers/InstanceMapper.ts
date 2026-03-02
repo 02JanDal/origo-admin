@@ -1,6 +1,6 @@
 import { IMapper } from "@/interfaces";
-import { DBMapInstance } from "@/models";
-import { GroupDto, MapInstanceDto, MapInstanceListItemDto } from "@/shared/interfaces/dtos";
+import { DBMapConfig, DBMapInstance } from "@/models";
+import { GroupDto, MapConfigDto, MapInstanceDto, MapInstanceListItemDto } from "@/shared/interfaces/dtos";
 import mongoose from "mongoose";
 import mapControlMapper from "@/mappers/mapControlMapper";
 
@@ -33,7 +33,7 @@ export class instanceMapper implements IMapper<DBMapInstance, MapInstanceDto> {
     };
   }
   toDBModel(dto: MapInstanceDto, create: boolean): DBMapInstance {
-    const dbMapInstance = {
+    const dbMapInstance: DBMapInstance = {
       _id: new mongoose.Types.ObjectId(dto.id),
       title: dto.title,
       name: dto.name,
@@ -49,34 +49,45 @@ export class instanceMapper implements IMapper<DBMapInstance, MapInstanceDto> {
   }
 }
 
-function mapDBConfigToConfigDto(dbConfig: any): any {
+function mapDBConfigToConfigDto(dbConfig: DBMapConfig): MapConfigDto {
   const mapper = new mapControlMapper();
   return {
-    controls: dbConfig.controls.map((control: any) => mapper.toDto(control)),
+    controls: dbConfig.controls!.map((control) => mapper.toDto(control)),
     settings: dbConfig.settings,
-    groups: dbConfig.groups,
-    layers: dbConfig.layers,
+    groups: degenerateGroups(dbConfig.groups as any),
+    layers: dbConfig.layers as any,
   };
 }
 
-function mapConfigDtoToDBConfig(configDto: any): any {
+function mapConfigDtoToDBConfig(configDto: MapConfigDto): DBMapConfig {
   const mapper = new mapControlMapper();
   return {
-    controls: configDto.controls.map((control: any) => mapper.toDBModel(control)),
-    settings: configDto.settings,
+    controls: configDto.controls.map((control) => mapper.toDBModel(control)),
+    settings: configDto.settings as any,
     groups: generateGroups(configDto.groups),
     layers: configDto.layers,
   };
 }
 
 function generateGroups(groups: GroupDto[]): any {
-  return groups.map((group) => {
+  return groups.map(({ extendedAttributes, ...group }) => {
     const groupId = group.id || new mongoose.Types.ObjectId();
-    let updatedGroup = {
+    return {
+      ...Object.fromEntries(extendedAttributes?.map(({ key, value }) => [key, value]) ?? []),
       ...group,
       id: groupId,
       groups: group.groups ? generateGroups(group.groups) : [],
     };
-    return updatedGroup;
   });
+}
+function degenerateGroups(groups: any[]): GroupDto[] {
+  return groups.map(({id, groups, name, title, abstract, expanded, ...rest}) => ({
+    id,
+    groups: degenerateGroups(groups),
+    name,
+    title,
+    abstract,
+    expanded,
+    extendedAttributes: Object.entries(rest).map(([key, value]) => ({ key, value: value as string}))
+  }))
 }

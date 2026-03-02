@@ -15,6 +15,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
+import KeyValuePairEditor from "@/components/Editors/KeyValuePairEditor";
 
 const layerServices = {
     WMS: WMSLayerService,
@@ -64,7 +65,7 @@ interface EditorProps {
     layers: LayerDto[];
     onSaveClick: () => void;
     onCancelClick: () => void;
-    onEditorChange: (field: keyof GroupDto | null, value: string, layersChanged: boolean) => void;
+    onEditorChange: (field: keyof GroupDto | null, value: any, layersChanged: boolean) => void;
 }
 export const Editor = ({ selectedGroup, isEditorValid, onSaveClick, onCancelClick, onEditorChange, setLayers, layers }: EditorProps) => {
     const [selectedRows, setSelectedRows] = useState<SelectedRows>({ WMS: [], WFS: [], WMTS: [], ALL: [] });
@@ -357,6 +358,7 @@ export const Editor = ({ selectedGroup, isEditorValid, onSaveClick, onCancelClic
                     minRows={6}
                     value={selectedGroup.abstract}
                     onChange={(e) => handleTextFieldChange('abstract', e.target.value)} />
+
                 <Box component='div' sx={{
                     marginTop: '20px',
                     '& > *': {
@@ -435,6 +437,12 @@ export const Editor = ({ selectedGroup, isEditorValid, onSaveClick, onCancelClic
                             )}
                         </Droppable>
                     </DragDropContext>
+
+                    <KeyValuePairEditor
+                        value={selectedGroup.extendedAttributes ?? []}
+                        onChange={(v) => onEditorChange("extendedAttributes", v, false)}
+                    />
+
                     <Stack direction="row" justifyContent="flex-end" spacing={2}>
                         <Button
                             variant="outlined"
@@ -478,6 +486,4 @@ export const Editor = ({ selectedGroup, isEditorValid, onSaveClick, onCancelClic
             </Box >
         </MainCard >
     );
-
 }
-
