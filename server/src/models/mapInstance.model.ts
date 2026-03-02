@@ -34,4 +34,4 @@ const mapInstanceSchema = new mongoose.Schema<DBMapInstance>({
 
 const MapInstanceModel = mongoose.model<DBMapInstance>("MapInstance", mapInstanceSchema);
 
-export { DBMapInstance, MapInstanceModel, mapInstanceSchema };
+export { DBMapInstance, DBMapConfig, MapInstanceModel, mapInstanceSchema };

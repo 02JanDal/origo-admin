@@ -77,7 +77,7 @@ export const LayersEditor = ({ setGroups, groups, setLayers, layers, onHandleSav
         resetState();
     };
 
-    const onEditorChange = (field: keyof GroupDto | null, value: string, layersChanged: boolean = false) => {
+    const onEditorChange = (field: keyof GroupDto | null, value: any, layersChanged: boolean = false) => {
         if (!selectedGroup) return;
         if (layersChanged) {
             setIsListDisabled(true);
