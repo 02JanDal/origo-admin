@@ -213,8 +213,8 @@ function transformLayers(layerDtos: any[], publish: boolean = false): any[] {
     } = layer;
     const transformedLayer = {
       ...restOfLayer,
-      source: source.name || layer.source,
-      style: style.name || layer.style,
+      source: source?.name ?? layer.source,
+      style: style?.name ?? layer.style,
     };
     if (clusterStyle) {
       transformedLayer.clusterStyle = clusterStyle.name;

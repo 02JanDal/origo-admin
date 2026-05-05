@@ -17,7 +17,7 @@ class ExtendedMapInstanceController extends BaseController<MapInstanceService> {
   async getLatestPublished(req: Request, res: Response): Promise<void> {
       const name = req.params.name;
       const published = await (this.service as any).getLatestPublished(name);
-      if (published) {
+      if (!published) {
           res.status(404).json({ message: "Not found" });
       } else {
           res.json(published);
