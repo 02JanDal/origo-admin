@@ -7,7 +7,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 0",
     "prestart": "npm run build",
-    "start": "node dist/server/src/server.js",
+    "start": "node --enable-source-maps dist/server/src/server.js",
     "dev": "nodemon --watch .env --watch src/ --exec ts-node -r tsconfig-paths/register src/server.ts",
     "build:unix": "(rm -r ./dist || true) && npx tsc && tsc-alias -p tsconfig.json && cp .env.template ./dist/server/.env.template && npm run postbuild:unix",
     "build": "rimraf ./dist && npx tsc && tsc-alias -p tsconfig.json && xcopy .env .\\dist\\server\\ /I",
