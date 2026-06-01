@@ -91,6 +91,23 @@ if (!process.env.DATABASE) {
 initializeDatabase(process.env.DATABASE as string);
 console.info(`[${new Date().toISOString()}] Database initialized...`);
 
+// Health check endpoints
+app.get(`${BASE_PATH}/healthz`, (_req, res) => {
+  // Liveness: the process is running and not stuck
+  res.status(200).json({ status: "ok" });
+});
+
+app.get(`${BASE_PATH}/readyz`, async (_req, res) => {
+  // Readiness: the service can accept traffic
+  try {
+    const mongoose = await import("mongoose");
+    await mongoose.default.connection.db!.admin().ping();
+    res.status(200).json({ status: "ready" });
+  } catch (err) {
+    res.status(503).json({ status: "not ready", reason: "database ping failed" });
+  }
+});
+
 app.use(`${BASE_PATH}`, FavouritesRoutes);
 app.use(`${BASE_PATH}`, LayerRoutes);
 app.use(`${BASE_PATH}`, MapInstanceRoutes);
