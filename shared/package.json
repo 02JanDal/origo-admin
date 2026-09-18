@@ -2,7 +2,7 @@
   "name": "origo-admin",
   "private": true,
   "description": "Shared dependencies for origo-admin monorepo",
-  "devDependencies": {
+  "dependencies": {
     "@types/json-schema": "^7.0.15"
   }
 }

@@ -13,9 +13,11 @@
   "author": "Haninge kommun",
   "license": "BSD-2-Clause",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.6",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^20.14.9",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -28,9 +30,7 @@
     "typescript": "^5.5.2"
   },
   "devDependencies": {
-    "@types/cookie-parser": "^1.4.7",
     "@types/express-session": "^1.18.0",
-    "@types/morgan": "^1.9.10",
     "nodemon": "^3.1.4",
     "ts-node": "^10.9.2"
   },

@@ -26,6 +26,7 @@ COPY ./server/tsconfig.json ./
 RUN npm install
 COPY ./server/ ./
 COPY ./shared/ ../shared/
+RUN cd ../shared && npm install
 RUN npm run build:unix
 
 # Slutlig körningsbar container

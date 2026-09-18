@@ -45,9 +45,6 @@ services:
       PROTECTED_IDP_SCOPE: "${IDP_SCOPE}"
       PROTECTED_IDP_REDIRECT_URI: "${IDP_REDIRECT_URI}"
       PROTECTED_IDP_SESSION_MAXAGE: 600 # Used to trigger a refresh of the client's session. Set to the IDP's token lifetime.
-    depends_on:
-      proxy:
-        condition: service_started
   proxy:
     image: ghcr.io/sweco-sedalh/origo-admin-proxy:latest
     build:
@@ -75,9 +72,6 @@ services:
       AUTH_CLIENT_DOMAIN: "" # The domain to set the cookie on
       DISPLAY_NAME: "" # The claim to use as display name
       REDIRECT_URI: ""  # Also the client redirect uri used for CORS.
-    depends_on:
-      server:
-        condition: service_healthy
   server:
     image: ghcr.io/sweco-sedalh/origo-admin-server:latest
     build:
@@ -102,9 +96,6 @@ services:
       SECURE_FAVOURITES: "false" # Set to true to require authentication for access to the favourites API endpoint.
     volumes:
       - uploads_data:/data/uploads
-    depends_on:
-      mongodb:
-        condition: service_healthy
     healthcheck:
       test: wget --no-verbose --tries=1 --spider http://localhost:3010/api/swagger || exit 1
       interval: 1m

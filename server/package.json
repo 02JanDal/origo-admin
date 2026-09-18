@@ -22,11 +22,11 @@
   "license": "BSD-2-Clause",
   "devDependencies": {
     "nodemon": "^3.1.0",
-    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.23.0-alpha.20240402.1",
+    "ts-node": "^10.9.2",
     "@types/cors": "^2.8.17",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^5.0.6",
@@ -47,6 +47,7 @@
     "express": "^5.2.1",
     "express-session": "^1.18.0",
     "helmet": "^7.1.0",
+    "json-schema": "^0.4.0",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.8.0",
     "mongoose": "^8.1.0",

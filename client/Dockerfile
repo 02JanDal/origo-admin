@@ -21,6 +21,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY ./client/ .
 COPY ./shared/ ../shared/
+RUN cd ../shared && npm install
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Learn more here: https://nextjs.org/telemetry
