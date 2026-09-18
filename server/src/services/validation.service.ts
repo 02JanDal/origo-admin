@@ -40,6 +40,13 @@ class ValidationService {
       );
 
       if (!schemaDto) {
+        if (["wms", "wmts", "wfs"].includes(layerType.toLowerCase())) {
+          // backwards compatibility for legacy layer types without schemas
+          return {
+            valid: true,
+          };
+        }
+
         return {
           valid: false,
           errors: [
