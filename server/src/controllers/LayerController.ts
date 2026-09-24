@@ -31,12 +31,10 @@ class LayerController {
     const type = req.params.type as string;
     const layers = req.body;
     const shouldValidate = req.query.skipValidation !== 'true';
+    const layersArray = Array.isArray(layers) ? layers : [layers];
 
     // Validate by default (unless explicitly skipped)
     if (shouldValidate) {
-      // If layers is an array, validate each one
-      const layersArray = Array.isArray(layers) ? layers : [layers];
-
       for (const layer of layersArray) {
         const result = await this.validationService.validateLayerData(type, layer);
         if (!result.valid) {
@@ -50,8 +48,25 @@ class LayerController {
 
     // Create layers if validation passed or was skipped
     const service = createLayerService(type);
-    const item = await service.create(layers);
-    res.status(201).json(item);
+    const { created, errors } = await service.create(layersArray);
+
+    if (errors.length > 0 && created.length === 0) {
+      // Nothing was created - all items failed
+      return res.status(500).json({
+        error: "Failed to create layer(s)",
+        creationErrors: errors,
+      });
+    }
+
+    if (errors.length > 0) {
+      // Some items were created, some failed
+      return res.status(207).json({
+        created,
+        creationErrors: errors,
+      });
+    }
+
+    res.status(201).json(created);
   }
 
   async update(req: Request, res: Response) {

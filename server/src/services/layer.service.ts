@@ -31,10 +31,12 @@ class LayerService<T extends DBLayerBase, TDto> {
     let response = await this.repository.findAll();
     return response.map((item) => this.toDtoMapper(item));
   }
-  async create(layers: TDto[]): Promise<TDto[]> {
+  async create(layers: TDto[]): Promise<{ created: TDto[]; errors: { index: number; message: string }[] }> {
     let dbObjects = layers.map((item) => this.toDbMapper(item, true));
     let created = [];
-    for (const dbObject of dbObjects) {
+    let errors: { index: number; message: string }[] = [];
+    for (let index = 0; index < dbObjects.length; index++) {
+      const dbObject = dbObjects[index];
       try {
         const createdObject = await this.repository.create(dbObject);
         const fetchedObject = await this.repository.find(
@@ -42,10 +44,15 @@ class LayerService<T extends DBLayerBase, TDto> {
         );
         created.push(fetchedObject);
       } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
         console.error(`[${new Date().toISOString()}] ${error}`);
+        errors.push({ index, message });
       }
     }
-    return created.map((item) => this.toDtoMapper(item));
+    return {
+      created: created.map((item) => this.toDtoMapper(item)),
+      errors,
+    };
   }
 
   async update(id: string, layer: TDto): Promise<TDto> {
