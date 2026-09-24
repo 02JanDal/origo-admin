@@ -22,16 +22,25 @@ export class UserInfoService {
 
   private async fetchWellKnownConfig(): Promise<WellKnownConfig> {
     const wellKnownUrl = process.env.PROTECTED_IDP_WELL_KNOWN;
-    if (!wellKnownUrl) {
-      throw new Error("Well-known URL is not configured");
+
+    if (wellKnownUrl) {
+      const response = await fetch(wellKnownUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch well-known config: ${response.statusText}`);
+      }
+      return await response.json();
     }
 
-    const response = await fetch(wellKnownUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch well-known config: ${response.statusText}`);
+    // Fall back to the explicitly configured endpoints when no well-known
+    // discovery URL is provided.
+    const userinfo_endpoint = process.env.PROTECTED_IDP_USERINFO_URL;
+    const token_endpoint = process.env.PROTECTED_IDP_TOKEN_URL;
+
+    if (!userinfo_endpoint || !token_endpoint) {
+      throw new Error("Well-known URL is not configured, and PROTECTED_IDP_USERINFO_URL/PROTECTED_IDP_TOKEN_URL fallback is missing");
     }
 
-    return await response.json();
+    return { userinfo_endpoint, token_endpoint };
   }
 
   public async getUserInfo(usernameOrToken: string, expires_in: number): Promise<UserInfo> {

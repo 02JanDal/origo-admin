@@ -8,6 +8,7 @@ services:
       SIGN_OUT_URL: 'http://localhost:3050/application/o/origo-admin/end-session/' # The URL to sign out from the OIDC provider
       NEXTAUTH_URL: 'http://localhost:3000'
       PROTECTED_ADMIN_ROLE: "Administratör"
+      NEXT_PUBLIC_BASE_PATH: "" # intentionally empty string
 
       # OIDC Settings
       PROTECTED_IDP_NAME: "Authentik"

@@ -39,7 +39,21 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async redirect({ url, baseUrl }) {
-      return baseUrl + process.env.NEXT_PUBLIC_BASE_PATH || "";
+      const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+      // NEXT_PUBLIC_BASE_PATH may be a full origin or a relative path. Only prefix baseUrl with it when it's relative, otherwise
+      // it already is the full base URL and should be used as-is.
+      const isAbsoluteBasePath = /^https?:\/\//i.test(basePath);
+      const effectiveBaseUrl = isAbsoluteBasePath ? basePath : `${baseUrl}${basePath}`;
+
+      if (url.startsWith("/")) return `${effectiveBaseUrl}${url}`;
+
+      try {
+        if (new URL(url).origin === new URL(baseUrl).origin) return url;
+      } catch {
+        // Ignore invalid URLs and fall back to the base URL below.
+      }
+
+      return effectiveBaseUrl;
     },
     async session({ session, token }) {
       if (token) {
