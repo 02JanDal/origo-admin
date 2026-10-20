@@ -186,10 +186,14 @@ function convertObjectSchema(property: ExtendedJSONSchema): z.ZodTypeAny {
 
       const isRequired = property.required?.includes(key) ?? false;
 
+      // Optional fields must also accept null: the form explicitly converts
+      // every blank/undefined field to null before submission (see
+      // JSONSchemaForm.tsx's undefinedToNull), so .optional() alone (which
+      // only accepts undefined) would reject those submissions.
       if (propSchema["x-validation"]?.requiredIf && !isRequired) {
-        fieldSchema = fieldSchema.optional();
+        fieldSchema = fieldSchema.nullable().optional();
       } else if (!isRequired) {
-        fieldSchema = fieldSchema.optional();
+        fieldSchema = fieldSchema.nullable().optional();
       }
 
       if (propSchema.default !== undefined) {
