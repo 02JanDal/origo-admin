@@ -1,4 +1,5 @@
 import { UserInfo, UserInfoCache } from "./userInfoCache";
+import { isJwt, verifyAndDecodeIdpToken, extractGroupsFromClaims, extractUsernameFromClaims } from "./auth";
 
 interface WellKnownConfig {
   userinfo_endpoint: string;
@@ -55,6 +56,22 @@ export class UserInfoService {
   }
 
   private async fetchUserInfo(accessToken: string, expires_in: number): Promise<UserInfo> {
+    // JWT-shaped access tokens are verified and read locally (via JWKS), since IdPs such as Entra ID can
+    // embed group memberships directly in the token but don't return them from a UserInfo call. Opaque
+    // (non-JWT) tokens fall back to the userinfo endpoint, as before.
+    if (isJwt(accessToken)) {
+      const claims = await verifyAndDecodeIdpToken(accessToken);
+      if (claims) {
+        return {
+          access_token: accessToken,
+          expires_at: Date.now() + expires_in * 1000,
+          groups: extractGroupsFromClaims(claims),
+          username: extractUsernameFromClaims(claims),
+        };
+      }
+      console.warn(`[${new Date().toISOString()}] JWT verification failed; falling back to userinfo endpoint`);
+    }
+
     const wellKnownConfig = await this.getWellKnownConfig();
 
     const response = await fetch(wellKnownConfig.userinfo_endpoint, {
@@ -68,12 +85,11 @@ export class UserInfoService {
     }
 
     const data = await response.json();
-    console.debug(data, process.env.PROTECTED_IDP_CLAIM_ROLES);
     return {
       access_token: accessToken,
       expires_at: Date.now() + expires_in * 1000,
-      groups: data[process.env.PROTECTED_IDP_CLAIM_ROLES ?? "groups"] ?? [],
-      username: data[process.env.PROTECTED_IDP_CLAIM_USERNAME ?? ""] ?? data.sub ?? data.email,
+      groups: extractGroupsFromClaims(data),
+      username: extractUsernameFromClaims(data) ?? data.sub ?? data.email,
     };
   }
 }
