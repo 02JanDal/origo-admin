@@ -2,7 +2,14 @@ import { PermissionCacheService } from "./permissionCache.service";
 import { UserInfo } from "./userInfo.service";
 
 export class JsonFilterService {
-  public async filterJson(json: any, proxyUrl: string, userInfo: UserInfo, cacheManager: PermissionCacheService): Promise<any> {
+  public async filterJson(
+    json: any,
+    proxyUrl: string,
+    userInfo: UserInfo,
+    cacheManager: PermissionCacheService,
+    options?: { skipPermissionFiltering?: boolean }
+  ): Promise<any> {
+    const skipPermissionFiltering = options?.skipPermissionFiltering === true;
     const permissions = typeof userInfo.groups === "string"
         ? userInfo.groups.replace(/^CN=/gi,"").split(",CN=").map((claim : string) => `CN=${claim}`)
         : Array.isArray(userInfo.groups)
@@ -10,7 +17,7 @@ export class JsonFilterService {
             : Object.keys(userInfo.groups);
     permissions.push(userInfo.username);
 
-    if (process.env.RESTRICT_LAYERS !== "false") {
+    if (!skipPermissionFiltering && process.env.RESTRICT_LAYERS !== "false") {
       if (json.layers) {
         json.layers = json.layers.filter((layer: any) => {
           return permissions.some((p: any) => cacheManager.hasPermission(p, layer.id));
@@ -18,7 +25,7 @@ export class JsonFilterService {
       }
     }
 
-    if (process.env.RESTRICT_MAPCONTROLS === "true") {
+    if (!skipPermissionFiltering && process.env.RESTRICT_MAPCONTROLS === "true") {
       console.log(`[${new Date().toISOString()}] RESTRICT_MAPCONTROLS is enabled`);
       if (json.controls) {
         json.controls = json.controls.filter((control: any) => {

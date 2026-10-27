@@ -63,6 +63,7 @@ export default function Page({ params: { id } }: any) {
                 title: mapInstanceData!.title,
                 name: mapInstanceData!.name,
                 abstract: mapInstanceData!.abstract,
+                isPublic: mapInstanceData!.isPublic ?? false,
                 instance: {
                     groups: updatedGroups,
                     layers: updatedLayers,
@@ -82,13 +83,14 @@ export default function Page({ params: { id } }: any) {
         }
     }
 
-    const handleSaveSettings = async (title: string, name: string, settings: MapSettingDto, abstract?: string) => {
+    const handleSaveSettings = async (title: string, name: string, settings: MapSettingDto, abstract?: string, isPublic?: boolean) => {
         try {
             const updatedData = {
                 id: mapInstanceData!.id,
                 title: title,
                 name: name,
                 abstract: abstract,
+                isPublic: isPublic ?? false,
                 instance: {
                     groups: mapInstanceData!.instance?.groups,
                     layers: mapInstanceData!.instance?.layers,
@@ -114,6 +116,7 @@ export default function Page({ params: { id } }: any) {
                 title: mapInstanceData!.title,
                 name: mapInstanceData!.name,
                 abstract: mapInstanceData!.abstract,
+                isPublic: mapInstanceData!.isPublic ?? false,
                 instance: {
                     groups: mapInstanceData!.instance?.groups,
                     layers: mapInstanceData!.instance?.layers,
@@ -145,6 +148,7 @@ export default function Page({ params: { id } }: any) {
                                 title={mapInstanceData?.title}
                                 name={mapInstanceData?.name}
                                 abstract={mapInstanceData?.abstract || ""}
+                                isPublic={mapInstanceData?.isPublic ?? false}
                                 settings={mapInstanceData?.instance?.settings || null}
                             />
                             <Controls

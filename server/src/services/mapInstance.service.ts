@@ -136,6 +136,12 @@ class MapInstanceService {
     }
     return this.publishedMapMapper.toDto(response[0]);
   }
+
+  async isPublic(name: string): Promise<boolean> {
+    const mapInstances = await this.repository.findByCriteria({ name: name });
+    return mapInstances.length > 0 && mapInstances[0].isPublic === true;
+  }
+
   async getPublished(id: string): Promise<PublishedMapConfigDto> {
     let response = await this.publishedRepository.find(id.replace(/\.json$/ig, ""));
     return this.publishedMapMapper.toDto(response);

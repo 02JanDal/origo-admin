@@ -1,5 +1,5 @@
 'use client';
-import { Grid, Typography, TextField } from "@mui/material";
+import { Grid, Typography, TextField, FormControlLabel, Checkbox } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { useRouter, usePathname } from "next/navigation";
@@ -101,6 +101,7 @@ export default function Page() {
             const newMapInstance: MapInstanceDto = {
                 name: entries.name.toString(),
                 title: entries.name.toString(),
+                isPublic: formData.get('isPublic') !== null,
                 instance: {
                     controls: [],
                     groups: [],
@@ -162,18 +163,24 @@ export default function Page() {
                         onSubmit={onSubmit}
                         errorMessage={errorMessage}
                         fieldToValidate="name"
-                        textField={<TextField
-                            autoFocus
-                            onChange={onChange}
-                            required
-                            margin="dense"
-                            id="name"
-                            name="name"
-                            label="Namn på kartinstans"
-                            type="text"
-                            fullWidth
-                            variant="standard"
-                        />} />
+                        textField={<>
+                            <TextField
+                                autoFocus
+                                onChange={onChange}
+                                required
+                                margin="dense"
+                                id="name"
+                                name="name"
+                                label="Namn på kartinstans"
+                                type="text"
+                                fullWidth
+                                variant="standard"
+                            />
+                            <FormControlLabel
+                                control={<Checkbox id="isPublic" name="isPublic" />}
+                                label="Publik kartinstans"
+                            />
+                        </>} />
                     <PublishMapFormDialog
                         open={isPublishDialogOpen} onClose={() => setPublishDialogOpen(false)} onConfirm={confirmPublish}
                         id={toBePublishedId}
