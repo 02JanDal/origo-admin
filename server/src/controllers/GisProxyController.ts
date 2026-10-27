@@ -28,6 +28,10 @@ class GisProxyController {
     await this.respondWithFilteredConfig(req, res, () => mapInstanceService.getPublished(req.params.id as string));
   }
 
+  async getPreview(req: Request, res: Response): Promise<void> {
+    await this.respondWithFilteredConfig(req, res, () => mapInstanceService.getPreview(req.params.id as string));
+  }
+
   private async respondWithFilteredConfig(req: Request, res: Response, fetchConfig: () => Promise<any>): Promise<void> {
     try {
       const token = extractTokenFromRequest(req);

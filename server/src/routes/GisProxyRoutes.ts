@@ -23,6 +23,7 @@ router.use(
 
 router.get(`${base}/mapinstances/:name/published/latest{.json}`, (req, res) => controller.getLatestPublished(req, res));
 router.get(`${base}/mapinstances/published/:id`, (req, res) => controller.getPublished(req, res));
+router.get(`${base}/mapinstances/:id/preview{.json}`, (req, res) => controller.getPreview(req, res));
 
 router.get(`${base}/health`, (req, res) => controller.health(req, res));
 router.get(`${base}/refresh-cache`, (req, res) => controller.refreshCache(req, res));
