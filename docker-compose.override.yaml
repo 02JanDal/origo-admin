@@ -24,10 +24,11 @@ services:
       PROTECTED_IDP_REDIRECT_URI: "${IDP_REDIRECT_URI:-http://localhost:3000/api/auth/callback/oidc}"
       PROTECTED_IDP_SESSION_MAXAGE: 600 # Used to trigger a refresh of the client's session. Set to the IDP's token lifetime.
     depends_on:
-      proxy:
+      server:
         condition: service_started
-  proxy:
+  server:
     environment:
+      AUTH_ENABLED: "true"
       WELL_KNOWN: "${IDP_WELLKNOWN_URL:-http://idp:9000/application/o/origo-admin/.well-known/openid-configuration}" # This is the OIDC well known endpoint for the OIDC provider
       TOKEN_URL: "${IDP_TOKEN_URL:-http://idp:9000/application/o/token/}" # This is the OIDC token endpoint for the OIDC provider
       CLIENT_ID: "${IDP_CLIENT_ID}" # This is the OIDC client id for the OIDC provider
@@ -36,12 +37,6 @@ services:
       AUTH_CLIENT_DOMAIN: "localhost" # The domain to set the cookie on
       DISPLAY_NAME: "" # The claim to use as display name
       REDIRECT_URI: ""  # Also the client redirect uri used for CORS.
-    depends_on:
-      server:
-        condition: service_healthy
-  server:
-    environment:
-      AUTH_ENABLED: "true"
     depends_on:
       mongodb:
         condition: service_healthy

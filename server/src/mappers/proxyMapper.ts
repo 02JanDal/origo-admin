@@ -14,6 +14,7 @@ class proxyLayerMapper implements IMapper<DBLayerBase, ProxyResourceDto> {
     this._linkResourceMapper = new linkResourceMapper();
   }
   toDto(model: DBLayerBase): ProxyResourceDto {
+    console.log("AA", model);
     const src = this._linkResourceMapper.toDto(model.source as DBLinkResource);
     return {
       type: "layer",

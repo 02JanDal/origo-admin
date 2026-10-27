@@ -1,17 +1,16 @@
+import { permissionCacheService } from "@/services/permissionCache.service";
+
+/**
+ * Refreshes the in-process GIS proxy permission/resource cache. This used to
+ * be an HTTP call to the standalone proxy's /proxy/refresh-cache endpoint
+ * (via PROXY_UPDATE_URL); now that the proxy lives in the same process, it's
+ * a direct in-process call.
+ */
 export async function updateProxyCache(): Promise<void> {
-  const proxyUpdateUrl = process.env.PROXY_UPDATE_URL;
-  if (!proxyUpdateUrl) {
-    console.warn(`[${new Date().toISOString()}] PROXY_UPDATE environment variable is not set. Skipping proxy cache update.`);
-    return;
-  }
-
   try {
-    const response = await fetch(proxyUpdateUrl);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    await permissionCacheService.refreshCache();
   } catch (error) {
     console.error(`[${new Date().toISOString()}] Failed to trigger proxy cache update: ${error}`);
   }
 }
+

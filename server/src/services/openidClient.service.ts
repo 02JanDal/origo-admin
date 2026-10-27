@@ -22,3 +22,12 @@ export const getOpenidClient = async (): Promise<Client> => {
   });
   return client;
 };
+
+/**
+ * Exposes the discovered issuer metadata (jwks_uri, issuer, supported signing algorithms, ...) for callers
+ * that need to verify tokens locally (see utils/auth.ts) without duplicating OIDC discovery.
+ */
+export const getIssuerMetadata = async (): Promise<Issuer["metadata"]> => {
+  const openidClient = await getOpenidClient();
+  return openidClient.issuer.metadata;
+};

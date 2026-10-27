@@ -18,7 +18,7 @@ services:
     environment:
       NEXT_PUBLIC_BASE_PATH: "/" # If the client is not hosted at the root of its domain, set its path here.
       BASE_URL: 'http://server:3010/api/' # Used for the API to fetch data from the server
-      ORIGO_URL: 'http://origo.se/#map=http://proxy.se/proxy/mapinstances' # Used for preview:ing the map in admin, should include everything before the mapinstance id
+      ORIGO_URL: 'http://origo.se/#map=http://server:3010/proxy/mapinstances' # Used for preview:ing the map in admin, should include everything before the mapinstance id
       NEXT_PUBLIC_PROXY_URL: http://server:3010/api/proxy # Used for the API to fetch data from the server
       VERSION: '0.9.0'
       UPDATED: '2024-09-01'
@@ -45,33 +45,6 @@ services:
       PROTECTED_IDP_SCOPE: "${IDP_SCOPE}"
       PROTECTED_IDP_REDIRECT_URI: "${IDP_REDIRECT_URI}"
       PROTECTED_IDP_SESSION_MAXAGE: 600 # Used to trigger a refresh of the client's session. Set to the IDP's token lifetime.
-  proxy:
-    image: ghcr.io/sweco-sedalh/origo-admin-proxy:latest
-    build:
-      dockerfile: ./proxy/Dockerfile
-      args:
-        NODE_ENV: production
-    ports:
-        - "3020:3020"
-    environment:
-      HOST: http://localhost # The public hostname, required if run behind reverse proxy
-      PORT: 3020 # The port the proxy will run on
-      PROXY_BASE_PATH: proxy # This is the base path for the proxy
-      RESOURCES_ENDPOINT_URL: http://server:3010/api/proxy/resources # This is the URL to the OrigoAdmin API that the proxy will use to fetch resources
-      ROLES_ENDPOINT_URL: http://server:3010/api/proxy/roles # This is the URL to the OrigoAdmin API that the proxy will use to fetch roles
-      MAPINSTANCES_ENDPOINT_URL: http://server:3010/api # This is the URL to the OrigoAdmin API that the proxy will use to fetch mapinstances
-      RESTRICT_MAPCONTROLS: "false" # If true, the map controls will be restricted to the ones defined in the mapinstance
-      API_ACCESS_TOKEN: "${API_ACCESS_TOKEN}" # This is the access token that the proxy will use to authenticate with the OrigoAdmin API
-      WELL_KNOWN: "${IDP_WELLKNOWN_URL}" # This is the OIDC well known endpoint for the OIDC provider
-      TOKEN_URL: "${IDP_TOKEN_URL}" # This is the OIDC token endpoint for the OIDC provider
-      CLIENT_ID: "${IDP_CLIENT_ID}" # This is the OIDC client id for the OIDC provider
-      CLIENT_SECRET: "${IDP_CLIENT_SECRET}" # This is the OIDC client secret for the OIDC provider
-      SCOPE: "${IDP_SCOPE}" # This is the OIDC scope for the OIDC provider e.g. openid groups
-      HTTP_TIMEOUT: 10000 # This is the timeout for the HTTP requests
-      SET_ACCESS_TOKEN_COOKIE: "true" # If true, the proxy will set the access token in a cookie
-      AUTH_CLIENT_DOMAIN: "" # The domain to set the cookie on
-      DISPLAY_NAME: "" # The claim to use as display name
-      REDIRECT_URI: ""  # Also the client redirect uri used for CORS.
   server:
     image: ghcr.io/sweco-sedalh/origo-admin-server:latest
     build:
@@ -92,8 +65,23 @@ services:
       USE_AZURE_STORAGE: "false" # Use Azure storage for uploaded files
       TOKEN_SECRET: '${TOKEN_SECRET}' # Secret for the JWT token, Generate this with npm run generate-secret-key in the server folder
       AUTH_ENABLED: "false"
-      PROXY_UPDATE_URL: "http://proxy/proxy/refresh-cache" # URL for the proxy update api, used when updating the cache. If not set, id will be replaced with layer_id in layers otherwise this will be handled by the proxy
       SECURE_FAVOURITES: "false" # Set to true to require authentication for access to the favourites API endpoint.
+      # --- GIS proxy / gateway (formerly the standalone `proxy` service, now built into this server) ---
+      GIS_PROXY_ENABLED: "false" # Set to true when serving published maps through the GIS proxy routes below.
+      PROXY_BASE_PATH: /proxy # Base path the GIS proxy routes (auth, gis passthrough, mapinstance JSON delivery, health, refresh-cache) are mounted under.
+      RESTRICT_MAPCONTROLS: "false" # If true, the map controls will be restricted to the ones defined in the mapinstance
+      API_ACCESS_TOKEN: "${API_ACCESS_TOKEN}" # The access token for the admin API
+      WELL_KNOWN: "${IDP_WELLKNOWN_URL}" # This is the OIDC well known endpoint for the OIDC provider
+      TOKEN_URL: "${IDP_TOKEN_URL}" # This is the OIDC token endpoint for the OIDC provider
+      CLIENT_ID: "${IDP_CLIENT_ID}" # This is the OIDC client id for the OIDC provider
+      CLIENT_SECRET: "${IDP_CLIENT_SECRET}" # This is the OIDC client secret for the OIDC provider
+      SCOPE: "${IDP_SCOPE}" # This is the OIDC scope for the OIDC provider e.g. openid groups
+      TIMEOUT: 10000 # This is the timeout for the GIS proxy's outgoing HTTP requests
+      SET_ACCESS_TOKEN_COOKIE: "true" # If true, the GIS proxy will set the access token in a cookie
+      AUTH_CLIENT_DOMAIN: "" # The domain to set the cookie on
+      DISPLAY_NAME: "" # The claim to use as display name
+      REDIRECT_URI: ""  # Also the client redirect uri used for CORS.
+      CORS_ORIGIN: "" # Allowed origin for the GIS proxy's cookie-based auth endpoints
     volumes:
       - uploads_data:/data/uploads
     healthcheck:

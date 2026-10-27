@@ -22,6 +22,7 @@ import {
 import { instanceListItemMapper, instanceMapper } from "@/mappers/InstanceMapper";
 import { linkResourceMapper } from "@/mappers/";
 import StyleSchemaMapper from "@/mappers/styleSchemaMapper";
+import { updateProxyCache } from "@/utils/proxyUtils";
 
 class MapInstanceService {
   private repository: Repository<DBMapInstance>;
@@ -96,6 +97,7 @@ class MapInstanceService {
     let publishedMap = this.instanceToPublishedMapMapper.toDBModel(mapInstance, comment, sources, styles);
 
     let response = await this.publishedRepository.create(publishedMap);
+    await this.refreshProxyCache();
     return this.publishedMapListItemMapper.toDto(response);
   }
 
@@ -110,7 +112,16 @@ class MapInstanceService {
     republishedMap._id = new mongoose.Types.ObjectId();
 
     let response = await this.publishedRepository.create(republishedMap);
+    await this.refreshProxyCache();
     return this.publishedMapListItemMapper.toDto(response);
+  }
+
+  private async refreshProxyCache(): Promise<void> {
+    try {
+      await updateProxyCache();
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Failed to update proxy cache: ${error}`);
+    }
   }
 
   async getPublishedList(id: string): Promise<PublishedMapListItemDto[]> {

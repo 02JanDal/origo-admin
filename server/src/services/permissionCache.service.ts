@@ -1,24 +1,19 @@
+import { ProxyService } from "./proxy.service";
+import { ProxyResourceDto, ProxyRoleDto } from "@/shared/interfaces/proxy";
+
 interface Permission {
   id: string;
   type: string;
 }
 
-interface Resource {
-  type: string;
-  id: string;
-  name: string;
-  sourceId: string;
-  source: string;
-  sourceUrl: string;
-}
 class OptimizedPermissionCache {
   private layerPermissions: Map<string, Set<string>> = new Map();
 
-  constructor(resources: any[], roles: any[]) {
+  constructor(resources: ProxyResourceDto[], roles: ProxyRoleDto[]) {
     this.buildCache(resources, roles);
   }
 
-  private buildCache(resources: any[], roles: any[]) {
+  private buildCache(resources: ProxyResourceDto[], roles: ProxyRoleDto[]) {
     const permissionToActors = new Map<string, Set<string>>();
     roles.forEach((role) => {
       role.permissions.forEach((perm: any) => {
@@ -54,21 +49,22 @@ class OptimizedPermissionCache {
     return actors.some((actor) => allowedActors.has(actor));
   }
 }
+
 class ResourcesCache {
-  private resources: any[];
-  private resourcesById: Map<string, Resource> = new Map();
-  private resourcesByName: Map<string, Resource[]> = new Map();
-  private resourcesBySourceId: Map<string, Resource[]> = new Map();
+  private resources: ProxyResourceDto[];
+  private resourcesById: Map<string, ProxyResourceDto> = new Map();
+  private resourcesByName: Map<string, ProxyResourceDto[]> = new Map();
+  private resourcesBySourceId: Map<string, ProxyResourceDto[]> = new Map();
   private sourceUrlByName: Map<string, string> = new Map();
   private sourceNameByUrl: Map<string, string> = new Map();
 
-  constructor(resources: any[]) {
+  constructor(resources: ProxyResourceDto[]) {
     this.resources = resources;
     this.buildCache(resources);
     console.info(`[${new Date().toISOString()}] Resources cache initialized`);
   }
 
-  private buildCache(resources: Resource[]) {
+  private buildCache(resources: ProxyResourceDto[]) {
     console.info(`[${new Date().toISOString()}] Building resources cache`);
     resources.forEach((resource) => {
       this.resourcesById.set(resource.id, resource);
@@ -78,26 +74,28 @@ class ResourcesCache {
       }
       this.resourcesByName.get(resource.name)!.push(resource);
 
-      if (!this.resourcesBySourceId.has(resource.sourceId)) {
-        this.resourcesBySourceId.set(resource.sourceId, []);
+      if (resource.sourceId) {
+        if (!this.resourcesBySourceId.has(resource.sourceId)) {
+          this.resourcesBySourceId.set(resource.sourceId, []);
+        }
+        this.resourcesBySourceId.get(resource.sourceId)!.push(resource);
       }
-      this.resourcesBySourceId.get(resource.sourceId)!.push(resource);
       if (resource?.type === "source") {
-        this.sourceUrlByName.set(resource.name, resource.sourceUrl);
-        this.sourceNameByUrl.set(resource.sourceUrl, resource.name);
+        this.sourceUrlByName.set(resource.name, resource.sourceUrl!);
+        this.sourceNameByUrl.set(resource.sourceUrl!, resource.name);
       }
     });
   }
 
-  getResourceById(id: string): Resource | undefined {
+  getResourceById(id: string): ProxyResourceDto | undefined {
     return this.resourcesById.get(id);
   }
 
-  getResourcesByName(name: string): Resource[] {
+  getResourcesByName(name: string): ProxyResourceDto[] {
     return this.resourcesByName.get(name) || [];
   }
 
-  getResourcesBySourceId(sourceId: string): Resource[] {
+  getResourcesBySourceId(sourceId: string): ProxyResourceDto[] {
     return this.resourcesBySourceId.get(sourceId) || [];
   }
 
@@ -109,26 +107,26 @@ class ResourcesCache {
     return this.sourceNameByUrl.get(url);
   }
 
-  getAllResources(): Resource[] {
+  getAllResources(): ProxyResourceDto[] {
     return Array.from(this.resourcesById.values());
   }
 
-  getResources(): any[] {
+  getResources(): ProxyResourceDto[] {
     return this.resources;
   }
 }
 
 class PermissionCache {
-  private roles: any[];
+  private roles: ProxyRoleDto[];
   private actorPermissions: Map<string, Set<string>> = new Map();
   private permissionDetails: Map<string, Permission> = new Map();
 
-  constructor(rolesData: any[]) {
+  constructor(rolesData: ProxyRoleDto[]) {
     this.roles = rolesData;
     this.buildCache(rolesData);
   }
 
-  private buildCache(rolesData: any[]) {
+  private buildCache(rolesData: ProxyRoleDto[]) {
     rolesData.forEach((role) => {
       role.actors.forEach((actor: { name: string; type: string }) => {
         const actorKey = `${actor.name.toLowerCase()}`;
@@ -136,7 +134,7 @@ class PermissionCache {
           this.actorPermissions.set(actorKey, new Set());
         }
 
-        role.permissions.forEach((permission: Permission) => {
+        role.permissions.forEach((permission: any) => {
           this.actorPermissions.get(actorKey)!.add(permission.id);
           this.permissionDetails.set(permission.id, permission);
         });
@@ -153,23 +151,25 @@ class PermissionCache {
     return this.permissionDetails.get(permissionId);
   }
 
-  getRoles(): any[] {
+  getRoles(): ProxyRoleDto[] {
     return this.roles;
   }
 }
-export class CacheManager {
+
+/**
+ * In-process replacement for the standalone proxy's CacheManager.
+ * Instead of fetching roles/resources over HTTP, it calls ProxyService directly.
+ */
+class PermissionCacheService {
   private lastUpdated: Date | null = null;
   private permissionCache: PermissionCache | null = null;
   private resourcesCache: ResourcesCache | null = null;
   private optimizedPermissionCache: OptimizedPermissionCache | null = null;
-  private rolesEndpoint: string;
-  private resourcesEndpoint: string;
-  private apiAccessToken: string;
+  private proxyService: ProxyService;
+  private initializing: Promise<void> | null = null;
 
-  constructor(rolesEndpoint: string, resourcesEndpoint: string, apiAccessToken: string) {
-    this.rolesEndpoint = rolesEndpoint;
-    this.resourcesEndpoint = resourcesEndpoint;
-    this.apiAccessToken = apiAccessToken;
+  constructor() {
+    this.proxyService = new ProxyService();
   }
 
   async initializeCache(): Promise<void> {
@@ -177,72 +177,70 @@ export class CacheManager {
   }
 
   async refreshCache(): Promise<void> {
+    // Avoid concurrent refreshes stampeding the database.
+    if (this.initializing) {
+      return this.initializing;
+    }
+
+    this.initializing = this.doRefreshCache();
     try {
-      console.info(`[${new Date().toISOString()}] Refreshing cache`);
+      await this.initializing;
+    } finally {
+      this.initializing = null;
+    }
+  }
 
-      const headers = {
-        Authorization: `Bearer ${this.apiAccessToken}`,
-        "Content-Type": "application/json",
-      };
+  private async doRefreshCache(): Promise<void> {
+    try {
+      console.info(`[${new Date().toISOString()}] Refreshing permission cache`);
 
-      // Fetch roles and resources concurrently
-      const [rolesResponse, resourcesResponse] = await Promise.all([fetch(this.rolesEndpoint, { headers }), fetch(this.resourcesEndpoint, { headers })]);
+      const [roles, resources] = await Promise.all([
+        this.proxyService.getAllRoles(),
+        this.proxyService.getAllResources(),
+      ]);
 
-      if (!rolesResponse.ok || !resourcesResponse.ok) {
-        throw new Error(`HTTP error! Roles status: ${rolesResponse.status}, Resources status: ${resourcesResponse.status}`);
-      }
-
-      const [roles, resources] = await Promise.all([rolesResponse.json(), resourcesResponse.json()]);
-
-      // Update all caches
       this.permissionCache = new PermissionCache(roles);
       this.resourcesCache = new ResourcesCache(resources);
       this.optimizedPermissionCache = new OptimizedPermissionCache(resources, roles);
       this.lastUpdated = new Date();
 
-      console.info(`[${new Date().toISOString()}] Cache refresh completed`);
+      console.info(`[${new Date().toISOString()}] Permission cache refresh completed`);
     } catch (error) {
-      console.error(`[${new Date().toISOString()}] Error refreshing cache:`, error);
-      console.error(`[${new Date().toISOString()}] Cache will not be updated, please check access token and urls for roles and resources i .env`);
+      console.error(`[${new Date().toISOString()}] Error refreshing permission cache:`, error);
     }
   }
 
-  getResourceById(id: string): Resource | undefined {
+  getResourceById(id: string): ProxyResourceDto | undefined {
     if (!this.resourcesCache) {
-      this.initializeCache();
-      throw new Error("Resources cache is not initialized, trying to initialize it now");
+      throw new Error("Resources cache is not initialized");
     }
     return this.resourcesCache.getResourceById(id);
   }
 
-  getResourcesByName(name: string): Resource[] {
+  getResourcesByName(name: string): ProxyResourceDto[] {
     if (!this.resourcesCache) {
-      this.initializeCache();
-      throw new Error("Resources cache is not initialized, trying to initialize it now");
+      throw new Error("Resources cache is not initialized");
     }
     return this.resourcesCache.getResourcesByName(name);
   }
 
   getSourceUrlByName(name: string): string | undefined {
     if (!this.resourcesCache) {
-      this.initializeCache();
-      throw new Error("Resources cache is not initialized, trying to initialize it now");
+      throw new Error("Resources cache is not initialized");
     }
     return this.resourcesCache.getSourceUrlByName(name);
   }
 
   getSourceByUrl(url: string): string | undefined {
     if (!this.resourcesCache) {
-      this.initializeCache();
-      throw new Error("Resources cache is not initialized, trying to initialize it now");
+      throw new Error("Resources cache is not initialized");
     }
     return this.resourcesCache.getSourceByUrl(url);
   }
 
   hasPermission(actorName: string, permissionId: string): boolean {
     if (!this.permissionCache) {
-      this.initializeCache();
-      throw new Error("Resources cache is not initialized, trying to initialize it now");
+      throw new Error("Permission cache is not initialized");
     }
     return this.permissionCache.hasPermission(actorName, permissionId);
   }
@@ -253,9 +251,10 @@ export class CacheManager {
     }
     return this.optimizedPermissionCache.hasLayerPermission(source, layerName, actors);
   }
+
   hasSourcePermission(source: string, actors: string[]): boolean {
     if (!this.permissionCache) {
-      throw new Error("Optimized permission cache is not initialized");
+      throw new Error("Permission cache is not initialized");
     }
 
     const permissionId = this.resourcesCache
@@ -276,7 +275,7 @@ export class CacheManager {
 
   hasControlPermission(actors: string, control: string): boolean {
     if (!this.permissionCache) {
-      throw new Error("Optimized permission cache is not initialized");
+      throw new Error("Permission cache is not initialized");
     }
 
     const permissionId = this.resourcesCache
@@ -291,8 +290,7 @@ export class CacheManager {
 
   getPermissionDetails(permissionId: string): Permission | undefined {
     if (!this.permissionCache) {
-      this.initializeCache();
-      throw new Error("Resources cache is not initialized, trying to initialize it now");
+      throw new Error("Permission cache is not initialized");
     }
     return this.permissionCache.getPermissionDetails(permissionId);
   }
@@ -349,3 +347,7 @@ export class CacheManager {
     return `${dateTimeMap.year}-${dateTimeMap.month}-${dateTimeMap.day} ${dateTimeMap.hour}:${dateTimeMap.minute}:${dateTimeMap.second}`;
   }
 }
+
+const permissionCacheService = new PermissionCacheService();
+
+export { PermissionCacheService, permissionCacheService };

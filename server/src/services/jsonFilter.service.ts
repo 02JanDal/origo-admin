@@ -1,8 +1,8 @@
-import { CacheManager } from "../cacheManager";
-import { UserInfo } from "./auth/userInfoCache";
+import { PermissionCacheService } from "./permissionCache.service";
+import { UserInfo } from "./userInfo.service";
 
-export class FilterJsonService {
-  public async filterJson(json: any, proxyUrl: string, userInfo: UserInfo, cacheManager: CacheManager): Promise<any> {
+export class JsonFilterService {
+  public async filterJson(json: any, proxyUrl: string, userInfo: UserInfo, cacheManager: PermissionCacheService): Promise<any> {
     const permissions = typeof userInfo.groups === "string"
         ? userInfo.groups.replace(/^CN=/gi,"").split(",CN=").map((claim : string) => `CN=${claim}`)
         : Array.isArray(userInfo.groups)

@@ -26,7 +26,6 @@ jobs:
             base: ""
           - directory: client
             base: "/admin"
-          - directory: proxy
           - directory: server
     steps:
       - name: Checkout repository

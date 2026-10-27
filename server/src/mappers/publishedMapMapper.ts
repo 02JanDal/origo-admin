@@ -139,14 +139,6 @@ function createDistinctSources(layers: any[], sources: LinkResourceDto[]): any {
       return;
     }
 
-    // For string sources (dynamic layers where source is a configured source, looked up below)
-    if (typeof layer.source === "string") {
-      if (!sourceMap.has(layer.source)) {
-        sourceMap.set(layer.source, {});
-      }
-      return;
-    }
-
     // For object sources - try to get name directly or look up by ID
     let sourceName = layer.source.name;
     let sourceUrl = layer.source.url;
@@ -201,31 +193,18 @@ function createDistinctStyles(
       const styleContainer = layer[styleKey];
       if (!styleContainer) return;
 
-      // Plain string name reference (e.g. api-select fields configured
-      // with valueField: "name") - look up the style schema by name.
-      let styleName: string | undefined;
-      let layerStyles: StyleItemDto[][] | undefined;
+      // Try to get name directly or look up by ID
+      let styleName = styleContainer.name;
+      let layerStyles = styleContainer.styles;
 
-      if (typeof styleContainer === "string") {
-        styleName = styleContainer;
-        const matchingStyle = styleSchemas.find((s) => s.name === styleName);
+      // If no name but has id, look up from styleSchemas array
+      if (!styleName && styleContainer.id) {
+        const matchingStyle = styleSchemas.find(
+          (s) => s.id === styleContainer.id
+        );
         if (matchingStyle) {
+          styleName = matchingStyle.name;
           layerStyles = matchingStyle.styles;
-        }
-      } else {
-        // Try to get name directly or look up by ID
-        styleName = styleContainer.name;
-        layerStyles = styleContainer.styles;
-
-        // If no name but has id, look up from styleSchemas array
-        if (!styleName && styleContainer.id) {
-          const matchingStyle = styleSchemas.find(
-            (s) => s.id === styleContainer.id
-          );
-          if (matchingStyle) {
-            styleName = matchingStyle.name;
-            layerStyles = matchingStyle.styles;
-          }
         }
       }
 
@@ -277,8 +256,13 @@ function transformLayers(
   sources: LinkResourceDto[] = [],
   styleSchemas: StyleSchemaDto[] = []
 ): any[] {
-  const proxyUrlSet =
-    process.env.PROXY_UPDATE_URL && process.env.PROXY_UPDATE_URL !== "";
+  // Used to be derived from `PROXY_UPDATE_URL` being set (i.e. "is a proxy
+  // deployed in front of this API"). Now that the GIS proxy/gateway is always
+  // part of this same process, this is an explicit opt-in flag instead:
+  // when enabled, published layer ids are left for the GIS proxy's
+  // jsonFilterService to resolve (id/layer_id swap happens there); when
+  // disabled, this mapper resolves it directly for direct API consumers.
+  const proxyUrlSet = process.env.GIS_PROXY_ENABLED?.toLowerCase?.() === "true";
   const authEnabled = process.env.AUTH_ENABLED?.toLowerCase?.() === "true";
   let layers = layerDtos.map((layer) => {
     const {

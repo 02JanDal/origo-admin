@@ -12,3 +12,7 @@ export * from "./permission.service";
 export * from "./proxy.service";
 export * from "./access-token.service";
 export * from "./dashboard.service";
+export * from "./permissionCache.service";
+export * from "./userInfo.service";
+export * from "./openidClient.service";
+export * from "./jsonFilter.service";

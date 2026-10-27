@@ -1,6 +1,7 @@
 import { Repository } from "@/repositories/Repository";
 import { Model } from "mongoose";
 import { DBLayerBase } from "@/models/layer.model";
+import { updateProxyCache } from "@/utils/proxyUtils";
 
 class LayerService<T extends DBLayerBase, TDto> {
   private repository: Repository<T>;
@@ -49,16 +50,26 @@ class LayerService<T extends DBLayerBase, TDto> {
         errors.push({ index, message });
       }
     }
+    await this.refreshProxyCache();
     return {
       created: created.map((item) => this.toDtoMapper(item)),
       errors,
     };
   }
 
+  private async refreshProxyCache(): Promise<void> {
+    try {
+      await updateProxyCache();
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Failed to update proxy cache: ${error}`);
+    }
+  }
+
   async update(id: string, layer: TDto): Promise<TDto> {
     let dbObject = this.toDbMapper(layer, false);
     await this.repository.update(id, dbObject);
     let updated = await this.repository.find(id);
+    await this.refreshProxyCache();
     return this.toDtoMapper(updated);
   }
   async duplicate(id: string): Promise<TDto> {
@@ -72,12 +83,14 @@ class LayerService<T extends DBLayerBase, TDto> {
     const createdObject = await this.repository.create(newObject);
 
     let duplicated = await this.repository.find(createdObject._id.toString());
+    await this.refreshProxyCache();
     return this.toDtoMapper(duplicated);
   }
 
   async delete(id: string): Promise<TDto> {
     const objectedToDelete = await this.repository.find(id);
     await this.repository.delete(objectedToDelete._id.toString());
+    await this.refreshProxyCache();
     return this.toDtoMapper(objectedToDelete);
   }
 }
