@@ -139,6 +139,14 @@ function createDistinctSources(layers: any[], sources: LinkResourceDto[]): any {
       return;
     }
 
+    // For string sources (dynamic layers where source is a configured source, looked up below)
+    if (typeof layer.source === "string") {
+      if (!sourceMap.has(layer.source)) {
+        sourceMap.set(layer.source, {});
+      }
+      return;
+    }
+
     // For object sources - try to get name directly or look up by ID
     let sourceName = layer.source.name;
     let sourceUrl = layer.source.url;
@@ -193,18 +201,31 @@ function createDistinctStyles(
       const styleContainer = layer[styleKey];
       if (!styleContainer) return;
 
-      // Try to get name directly or look up by ID
-      let styleName = styleContainer.name;
-      let layerStyles = styleContainer.styles;
+      // Plain string name reference (e.g. api-select fields configured
+      // with valueField: "name") - look up the style schema by name.
+      let styleName: string | undefined;
+      let layerStyles: StyleItemDto[][] | undefined;
 
-      // If no name but has id, look up from styleSchemas array
-      if (!styleName && styleContainer.id) {
-        const matchingStyle = styleSchemas.find(
-          (s) => s.id === styleContainer.id
-        );
+      if (typeof styleContainer === "string") {
+        styleName = styleContainer;
+        const matchingStyle = styleSchemas.find((s) => s.name === styleName);
         if (matchingStyle) {
-          styleName = matchingStyle.name;
           layerStyles = matchingStyle.styles;
+        }
+      } else {
+        // Try to get name directly or look up by ID
+        styleName = styleContainer.name;
+        layerStyles = styleContainer.styles;
+
+        // If no name but has id, look up from styleSchemas array
+        if (!styleName && styleContainer.id) {
+          const matchingStyle = styleSchemas.find(
+            (s) => s.id === styleContainer.id
+          );
+          if (matchingStyle) {
+            styleName = matchingStyle.name;
+            layerStyles = matchingStyle.styles;
+          }
         }
       }
 
