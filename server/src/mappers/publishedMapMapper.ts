@@ -80,6 +80,10 @@ export class PreviewMapMapper
       : [];
 
     return {
+      metadata: {
+        title: model.title,
+        abstract: model.abstract,
+      },
       controls: model.instance.controls?.map((control: any) => control.control),
       ...settings,
       groups: groupsWithoutId,

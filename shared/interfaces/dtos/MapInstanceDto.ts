@@ -57,6 +57,10 @@ export interface PublishedMapListItemDto {
 }
 
 export interface PublishedMapConfigDto {
+  metadata: {
+    title: string;
+    abstract?: string;
+  };
   controls: any;
   groups: any;
   source: any;
