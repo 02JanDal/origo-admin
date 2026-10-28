@@ -42,6 +42,12 @@
                 "field": "isPublished",
                 "inputType": "checkbox",
                 "defaultValue": "false"
+            },
+            {
+                "headerName": "Publik",
+                "field": "isPublic",
+                "inputType": "checkbox",
+                "defaultValue": "false"
             }
         ]
     }

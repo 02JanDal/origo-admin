@@ -8,6 +8,7 @@ interface DBMapInstance {
   title: string;
   name: string;
   abstract?: string;
+  isPublic?: boolean;
   instance: DBMapConfig;
 }
 
@@ -29,6 +30,7 @@ const mapInstanceSchema = new mongoose.Schema<DBMapInstance>({
   title: { type: String, required: true },
   name: { type: String, required: true },
   abstract: { type: String, required: false },
+  isPublic: { type: Boolean, required: false, default: false },
   instance: { type: mapConfigSchema, required: true },
 });
 

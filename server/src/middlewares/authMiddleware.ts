@@ -3,7 +3,10 @@ import { Request, Response, NextFunction } from "express";
 
 export const checkPermission = (requiredPermission: string) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers["authorization"]?.split(" ")[1];
+    const authorizationHeader = req.headers["authorization"];
+    const token = Array.isArray(authorizationHeader)
+      ? authorizationHeader[0]?.split(" ")[1]
+      : authorizationHeader?.split(" ")[1];
 
     if (!token) {
       return res.status(401).json({ error: "No token provided" });

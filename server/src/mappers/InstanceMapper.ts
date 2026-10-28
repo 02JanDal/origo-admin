@@ -11,6 +11,7 @@ export class instanceListItemMapper implements IMapper<DBMapInstance, MapInstanc
       title: model.title,
       name: model.name,
       abstract: model.abstract,
+      isPublic: model.isPublic ?? false,
       layers: model.instance.layers ? model.instance.layers.length : 0,
       settings: model.instance.settings ? model.instance.settings.title : "",
       controls: model.instance.controls ? model.instance.controls.length : 0,
@@ -29,6 +30,7 @@ export class instanceMapper implements IMapper<DBMapInstance, MapInstanceDto> {
       title: model.title,
       name: model.name,
       abstract: model.abstract,
+      isPublic: model.isPublic ?? false,
       instance: mapDBConfigToConfigDto(model.instance),
     };
   }
@@ -38,6 +40,7 @@ export class instanceMapper implements IMapper<DBMapInstance, MapInstanceDto> {
       title: dto.title,
       name: dto.name,
       abstract: dto.abstract,
+      isPublic: dto.isPublic ?? false,
       instance: mapConfigDtoToDBConfig(dto.instance),
     };
 

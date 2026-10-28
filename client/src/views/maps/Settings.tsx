@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Select, MenuItem, Button, Box, Stack, InputLabel, Tooltip } from '@mui/material';
+import { TextField, Select, MenuItem, Button, Box, Stack, InputLabel, Tooltip, FormControlLabel, Switch } from '@mui/material';
 import { MapSettingDto } from '@/shared/interfaces/dtos';
 import { z } from 'zod';
 import { MapSettingService as service } from '@/api';
@@ -8,14 +8,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 interface SettingsProps {
-    onSave: (title: string, name: string, settings: MapSettingDto, abstract?: string) => void;
+    onSave: (title: string, name: string, settings: MapSettingDto, abstract?: string, isPublic?: boolean) => void;
     title: string;
     name: string;
     abstract: string;
+    isPublic: boolean;
     settings: MapSettingDto | null;
 }
 
-const Settings = ({ onSave, title, name, settings, abstract }: SettingsProps) => {
+const Settings = ({ onSave, title, name, settings, abstract, isPublic }: SettingsProps) => {
     const settingsSchema = z.object({
         title: z.string().min(1, 'Titel krävs'),
         name: z.string().min(1, 'Namn krävs'),
@@ -38,10 +39,12 @@ const Settings = ({ onSave, title, name, settings, abstract }: SettingsProps) =>
     const [_title, setTitle] = useState(title);
     const [_name, setName] = useState(name);
     const [_abstract, setAbstract] = useState(abstract);
+    const [_isPublic, setIsPublic] = useState(isPublic);
     const { data } = useQuery({ queryKey: [queryKey], queryFn: () => service.fetchAll() });
 
     useEffect(() => {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
+        setIsPublic(isPublic);
         if (settings != undefined) {
             setSelectedSetting(settings!.title);
         }
@@ -79,7 +82,7 @@ const Settings = ({ onSave, title, name, settings, abstract }: SettingsProps) =>
     const onHandleSave = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const selected = data!.find(setting => setting.title === selectedSetting);
-        onSave(_title, _name, selected!, _abstract);
+        onSave(_title, _name, selected!, _abstract, _isPublic);
     }
 
     const handleSettingChange = (event: any) => {
@@ -126,6 +129,10 @@ const Settings = ({ onSave, title, name, settings, abstract }: SettingsProps) =>
                 multiline
                 minRows={6}
                 margin="normal"
+            />
+            <FormControlLabel
+                control={<Switch checked={_isPublic} onChange={(_event, checked) => setIsPublic(checked)} />}
+                label="Publik kartinstans"
             />
 
             <InputLabel>Inställningar</InputLabel>

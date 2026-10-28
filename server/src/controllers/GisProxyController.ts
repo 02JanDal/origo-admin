@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 import { URL } from "url";
 import { permissionCacheService } from "@/services/permissionCache.service";
 import { JsonFilterService } from "@/services/jsonFilter.service";
-import { userInfoService } from "@/services/userInfo.service";
+import { UserInfo, userInfoService } from "@/services/userInfo.service";
 import { extractTokenFromRequest } from "@/utils/auth";
 import { GISRequestAnalyzer } from "@/utils/gisRequestAnalyzer";
 import { getProxyBasePath } from "@/utils/gisProxyPath";
@@ -21,7 +21,12 @@ class GisProxyController {
    * service directly, in-process.
    */
   async getLatestPublished(req: Request, res: Response): Promise<void> {
-    await this.respondWithFilteredConfig(req, res, () => mapInstanceService.getLatestPublished(req.params.name as string));
+    await this.respondWithFilteredConfig(
+      req,
+      res,
+      () => mapInstanceService.getLatestPublished(req.params.name as string),
+      async () => mapInstanceService.isPublic(req.params.name as string)
+    );
   }
 
   async getPublished(req: Request, res: Response): Promise<void> {
@@ -31,22 +36,39 @@ class GisProxyController {
   async getPreview(req: Request, res: Response): Promise<void> {
     await this.respondWithFilteredConfig(req, res, () => mapInstanceService.getPreview(req.params.id as string));
   }
-
-  private async respondWithFilteredConfig(req: Request, res: Response, fetchConfig: () => Promise<any>): Promise<void> {
+  
+  private async respondWithFilteredConfig(
+    req: Request,
+    res: Response,
+    fetchConfig: () => Promise<any>,
+    canAccessWithoutToken: (() => Promise<boolean>) | null = null
+  ): Promise<void> {
     try {
       const token = extractTokenFromRequest(req);
-      if (token === null) {
+      const isPublicUnauthenticatedRequest =
+        token === null && canAccessWithoutToken !== null ? await canAccessWithoutToken() : false;
+      if (token === null && !isPublicUnauthenticatedRequest) {
         res.status(401).send("Unauthorized");
         return;
       }
 
-      let userInfo;
-      try {
-        userInfo = await userInfoService.getUserInfo(token.value, token.expiresIn);
-      } catch (error) {
-        console.error(`[${new Date().toISOString()}] Error retrieving user info:`, error);
-        res.status(401).send("Unauthorized");
-        return;
+      let userInfo: UserInfo = {
+        access_token: "",
+        expires_at: 0,
+        groups: [],
+        username: "",
+      };
+      let skipPermissionFiltering = false;
+      if (!isPublicUnauthenticatedRequest) {
+        try {
+          userInfo = await userInfoService.getUserInfo(token!.value, token!.expiresIn);
+        } catch (error) {
+          console.error(`[${new Date().toISOString()}] Error retrieving user info:`, error);
+          res.status(401).send("Unauthorized");
+          return;
+        }
+      } else {
+        skipPermissionFiltering = true;
       }
 
       const json = await fetchConfig();
@@ -62,7 +84,9 @@ class GisProxyController {
       const hostName = proxyHost || `${protocol}://${req.headers.host}`;
       const proxyBaseUrl = `${hostName}${getProxyBasePath()}/`;
 
-      const filtered = await jsonFilterService.filterJson(json, proxyBaseUrl, userInfo, permissionCacheService);
+      const filtered = await jsonFilterService.filterJson(json, proxyBaseUrl, userInfo, permissionCacheService, {
+        skipPermissionFiltering,
+      });
       res.json(filtered);
     } catch (error) {
       console.error(`[${new Date().toISOString()}] Error serving map config:`, error);
