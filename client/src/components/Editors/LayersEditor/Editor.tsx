@@ -479,7 +479,7 @@ export const Editor = ({ selectedGroup, isEditorValid, onSaveClick, onCancelClic
                             editedLayers={localLayersState}
                             setEditedLayers={setLocalLayersState}
                             layerToEdit={selectedLayer as LayerDto}
-                            featureInfoClickLayers={Array.from(new Set(layers.filter(layer => layer.type === 'WFS').map(layer => layer.name)))}
+                            featureInfoClickLayers={Array.from(new Set(layers.filter(layer => ["WFS", "AGS_FEATURE", "OGCAPI"].includes(layer.type)).map(layer => layer.name)))}
                         />
                     )
                 }
