@@ -20,3 +20,4 @@ export * from "./KeyValuePairDto";
 export * from "./DashboardDto";
 export * from "./SyncLayerRequestDto";
 export * from "./JsonSchemaDto";
+export * from "./ProxyCacheDto";

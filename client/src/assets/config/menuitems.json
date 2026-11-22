@@ -139,6 +139,14 @@
         "type": "item",
         "icon": "DataObject",
         "disabled": false
+      },
+      {
+        "id": 44,
+        "name": "Proxy-cache",
+        "urlSegment": "/proxyCache",
+        "type": "item",
+        "icon": "Cached",
+        "disabled": false
       }
     ]
   }

@@ -13,3 +13,4 @@ export * from "./RoutesController";
 export * from "./DashboardController";
 export * from "./GisAuthController";
 export * from "./GisProxyController";
+export * from "./ProxyCacheController";

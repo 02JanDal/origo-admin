@@ -295,6 +295,10 @@ class PermissionCacheService {
     return this.permissionCache.getPermissionDetails(permissionId);
   }
 
+  getLastUpdated(): Date | null {
+    return this.lastUpdated;
+  }
+
   isCacheInitialized(): boolean {
     return this.permissionCache !== null && this.resourcesCache !== null;
   }
