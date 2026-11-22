@@ -41,8 +41,8 @@ export default function Page() {
                     <MainCard>
                         <Stack spacing={2} alignItems="flex-start">
                             <Typography variant="body1">
-                                Proxyn cachar roller, behörigheter och resurser. Cachen förnyas när servern startar och när något sparas.
-                                Förnya den manuellt om ändringar gjorts direkt i databasen.
+                                Proxyn cachar roller, behörigheter och resurser. Cachen förnyas när servern startar
+                                {status?.refreshOnSave === false ? '. Förnyelse vid sparning är avstängd (PROXY_CACHE_REFRESH_ON_SAVE), så förnya cachen här efter ändringar.' : ' och när något sparas. Förnya den manuellt om ändringar gjorts direkt i databasen.'}
                             </Typography>
                             <Typography variant="body1">
                                 Senast förnyad: <strong>{status?.lastUpdated ? dayjs(status.lastUpdated).format('YYYY-MM-DD HH:mm:ss') : '–'}</strong>

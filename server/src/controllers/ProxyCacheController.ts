@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { permissionCacheService } from "@/services/permissionCache.service";
+import { isRefreshOnSaveEnabled } from "@/utils/proxyUtils";
 import { ProxyCacheStatusDto } from "@/shared/interfaces/dtos";
 
 class ProxyCacheController {
@@ -22,6 +23,7 @@ class ProxyCacheController {
     return {
       initialized: permissionCacheService.isCacheInitialized(),
       lastUpdated: permissionCacheService.getLastUpdated()?.toISOString(),
+      refreshOnSave: isRefreshOnSaveEnabled(),
     };
   }
 }
