@@ -14,3 +14,4 @@ export { default as DashboardRoutes } from "./DashboardRoutes";
 export { default as JsonSchemaRoutes } from "./JsonSchemaRoutes";
 export { default as GisAuthRoutes } from "./GisAuthRoutes";
 export { default as GisProxyRoutes } from "./GisProxyRoutes";
+export { default as ProxyCacheRoutes } from "./ProxyCacheRoutes";

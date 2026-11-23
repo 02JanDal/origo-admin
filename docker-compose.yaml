@@ -69,6 +69,7 @@ services:
       # --- GIS proxy / gateway (formerly the standalone `proxy` service, now built into this server) ---
       GIS_PROXY_ENABLED: "false" # Set to true when serving published maps through the GIS proxy routes below.
       PROXY_BASE_PATH: /proxy # Base path the GIS proxy routes (auth, gis passthrough, mapinstance JSON delivery, health, refresh-cache) are mounted under.
+      PROXY_CACHE_REFRESH_ON_SAVE: "true" # If true, the proxy cache is refreshed after saving. Can always be refreshed manually from the admin client.
       RESTRICT_MAPCONTROLS: "false" # If true, the map controls will be restricted to the ones defined in the mapinstance
       API_ACCESS_TOKEN: "${API_ACCESS_TOKEN}" # The access token for the admin API
       WELL_KNOWN: "${IDP_WELLKNOWN_URL}" # This is the OIDC well known endpoint for the OIDC provider

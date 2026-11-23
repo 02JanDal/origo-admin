@@ -45,6 +45,7 @@ import {
   RouteRoutes,
   DashboardRoutes,
   JsonSchemaRoutes,
+  ProxyCacheRoutes,
   GisAuthRoutes,
   GisProxyRoutes,
 } from "./routes";
@@ -153,6 +154,7 @@ app.use(`${BASE_PATH}`, AccessTokenRoutes);
 app.use(`${BASE_PATH}`, RouteRoutes);
 app.use(`${BASE_PATH}`, DashboardRoutes);
 app.use(`${BASE_PATH}`, JsonSchemaRoutes);
+app.use(`${BASE_PATH}`, ProxyCacheRoutes);
 app.use(`${BASE_PATH}/uploads`, express.static(path.resolve(UPLOAD_FOLDER)));
 
 // GIS gateway (formerly the standalone proxy/): intentionally mounted at the

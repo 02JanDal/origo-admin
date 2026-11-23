@@ -37,6 +37,7 @@ class PermissionService {
     }
 
     var response = await this.repository.create(this.mapper.toDBModel(role));
+    await this.refreshProxyCache();
     return this.mapper.toDto(response);
   }
 
@@ -53,12 +54,7 @@ class PermissionService {
       this.mapper.toDBModel(role)
     );
 
-    try {
-      await updateProxyCache();
-    } catch (error) {
-      console.error(`[${new Date().toISOString()}] Failed to update proxy cache: ${error}`);
-    }
-
+    await this.refreshProxyCache();
     return this.mapper.toDto(response);
   }
 
@@ -69,12 +65,22 @@ class PermissionService {
 
     newObject.role = newObject.role + " (copy)";
     let created = await this.repository.create(newObject);
+    await this.refreshProxyCache();
     return this.mapper.toDto(created);
   }
 
   async delete(id: string): Promise<RoleDto> {
     var response = await this.repository.delete(id);
+    await this.refreshProxyCache();
     return this.mapper.toDto(response);
+  }
+
+  private async refreshProxyCache(): Promise<void> {
+    try {
+      await updateProxyCache();
+    } catch (error) {
+      console.error(`[${new Date().toISOString()}] Failed to update proxy cache: ${error}`);
+    }
   }
 }
 

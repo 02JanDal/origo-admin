@@ -167,6 +167,7 @@ class PermissionCacheService {
   private optimizedPermissionCache: OptimizedPermissionCache | null = null;
   private proxyService: ProxyService;
   private initializing: Promise<void> | null = null;
+  private refreshAgain = false;
 
   constructor() {
     this.proxyService = new ProxyService();
@@ -179,10 +180,17 @@ class PermissionCacheService {
   async refreshCache(): Promise<void> {
     // Avoid concurrent refreshes stampeding the database.
     if (this.initializing) {
+      // A running refresh may have read the data before this save, so refresh once more when it is done.
+      this.refreshAgain = true;
       return this.initializing;
     }
 
-    this.initializing = this.doRefreshCache();
+    this.initializing = (async () => {
+      do {
+        this.refreshAgain = false;
+        await this.doRefreshCache();
+      } while (this.refreshAgain);
+    })();
     try {
       await this.initializing;
     } finally {
@@ -293,6 +301,10 @@ class PermissionCacheService {
       throw new Error("Permission cache is not initialized");
     }
     return this.permissionCache.getPermissionDetails(permissionId);
+  }
+
+  getLastUpdated(): Date | null {
+    return this.lastUpdated;
   }
 
   isCacheInitialized(): boolean {
