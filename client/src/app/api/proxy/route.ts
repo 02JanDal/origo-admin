@@ -33,7 +33,10 @@ async function handler(req: NextRequest) {
     }
 
     try {
-      const userInfo = await userInfoService.getUserInfo(jwtPayload.access_token as string, jwtPayload.accessTokenExpires as number);
+      // getUserInfo expects seconds left, accessTokenExpires is a timestamp in milliseconds
+      const accessTokenExpires = jwtPayload.accessTokenExpires as number | undefined;
+      const expiresIn = accessTokenExpires ? Math.max(0, Math.floor((accessTokenExpires - Date.now()) / 1000)) : 0;
+      const userInfo = await userInfoService.getUserInfo(jwtPayload.access_token as string, expiresIn);
       const userGroups = typeof userInfo.groups === "string" ? userInfo.groups.split(",").map((dn: string) => dn.trim()) : Array.isArray(userInfo.groups) ? userInfo.groups : Object.keys(userInfo.groups);
       const roleInfo = await getRoleInfo(ADMIN_ROLE!);
 

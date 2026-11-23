@@ -23,6 +23,10 @@ export class UserInfoCache {
   }
 
   set(userInfo: UserInfo): void {
+    // Entries for replaced access tokens are never read again, remove them when expired
+    this.cache.forEach((cached, token) => {
+      if (this.isExpired(cached)) this.remove(token);
+    });
     const { access_token, username } = userInfo;
     this.cache.set(access_token, userInfo);
     this.usernameToToken.set(username, access_token);
@@ -45,7 +49,7 @@ export class UserInfoCache {
   remove(token: string): void {
     const userInfo = this.cache.get(token);
     if (userInfo) {
-      this.usernameToToken.delete(userInfo.username);
+      if (this.usernameToToken.get(userInfo.username) === token) this.usernameToToken.delete(userInfo.username);
       this.cache.delete(token);
     }
   }
