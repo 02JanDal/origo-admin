@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Grid, Accordion, AccordionSummary, AccordionDetails, Typography, Box, IconButton } from '@mui/material';
+import { GridLegacy as Grid, Accordion, AccordionSummary, AccordionDetails, Typography, Box, IconButton } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import SaveIcon from '@mui/icons-material/Save';
 import MainCard from '@/components/Cards/MainCard/MainCard';

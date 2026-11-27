@@ -1,7 +1,7 @@
 "use client";
 import styles from "@/app/page.module.css";
 import * as React from "react";
-import { Grid, Typography } from "@mui/material";
+import { GridLegacy as Grid, Typography } from "@mui/material";
 import { DashboardService as service } from '@/api';
 import ReportCard from "@/components/Cards/ReportCard/ReportCard";
 import DetailedDataTable from "@/components/Tables/DetailedDataTable";

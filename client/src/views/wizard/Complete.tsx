@@ -1,7 +1,7 @@
 import MainCard from '@/components/Cards/MainCard/MainCard';
 import { DataRow } from '@/interfaces';
 import { LinkResourceDto } from '@/shared/interfaces/dtos';
-import { Grid, List, ListItem, Paper, Stack, Typography, styled } from '@mui/material';
+import { GridLegacy as Grid, List, ListItem, Paper, Stack, Typography, styled } from '@mui/material';
 import React from 'react';
 
 interface CompleteProps {

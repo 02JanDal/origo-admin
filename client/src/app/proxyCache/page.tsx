@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Grid, Typography, Button, Stack } from "@mui/material";
+import { GridLegacy as Grid, Typography, Button, Stack } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

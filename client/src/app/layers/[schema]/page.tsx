@@ -1,15 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { use } from 'react';
 import GenericLayersListingView from '@/views/layers/GenericLayersListingView';
 
 interface GenericSchemaListPageProps {
-  params: {
+  params: Promise<{
     schema: string;
-  };
+  }>;
 }
 
-export default function GenericSchemaListPage({ params }: GenericSchemaListPageProps) {
+export default function GenericSchemaListPage(props: GenericSchemaListPageProps) {
+  const params = use(props.params);
   const schemaType = params.schema;
 
   return <GenericLayersListingView schemaType={schemaType} />;

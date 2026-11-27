@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Grid, Typography, Stack, TextField, InputLabel, Button, FormControlLabel, Switch, Box } from "@mui/material";
+import { GridLegacy as Grid, Typography, Stack, TextField, InputLabel, Button, FormControlLabel, Switch, Box } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { CreateAccessTokenDto, GroupedRoutes } from '@/shared/interfaces/dtos';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import { TreeView } from '@mui/x-tree-view/TreeView';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import InformationDialog from '@/components/Dialogs/InformationDialog';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { useApp } from '@/contexts/AppContext';
@@ -141,7 +141,7 @@ export default function Page() {
     const renderTree = (nodes: GroupedRoutes) => (
         <TreeItem
             key={nodes.route}
-            nodeId={nodes.route}
+            itemId={nodes.route}
             label={
                 <FormControlLabel
                     control={
@@ -168,7 +168,7 @@ export default function Page() {
             {nodes.routes.map((route) => (
                 <TreeItem
                     key={route.permission}
-                    nodeId={route.permission}
+                    itemId={route.permission}
                     label={
                         <FormControlLabel
                             control={
@@ -233,13 +233,12 @@ export default function Page() {
                                 ) : error ? (
                                     <Typography>Error loading routes</Typography>
                                 ) : (!isAllAccess && (
-                                    <TreeView
+                                    <SimpleTreeView
                                         aria-label="permissions tree"
-                                        defaultExpandIcon={<ChevronRightIcon />}
-                                        defaultCollapseIcon={<ExpandMoreIcon />}
+                                        slots={{ expandIcon: ChevronRightIcon, collapseIcon: ExpandMoreIcon }}
                                     >
                                         {groupedRoutes?.map(renderTree)}
-                                    </TreeView>
+                                    </SimpleTreeView>
                                 )
                                 )}
                             </Grid>

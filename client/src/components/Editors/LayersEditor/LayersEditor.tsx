@@ -1,5 +1,5 @@
 import { GroupDto, LayerDto } from "@/shared/interfaces/dtos";
-import { Box, Grid, Typography } from "@mui/material";
+import { Box, GridLegacy as Grid, Typography } from "@mui/material";
 import { ListComponent } from "./ListComponent";
 import { useState } from "react";
 import { Editor } from "./Editor";

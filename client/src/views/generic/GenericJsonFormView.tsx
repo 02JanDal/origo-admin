@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, Stack, TextField, InputLabel, Button } from "@mui/material";
+import { GridLegacy as Grid, Typography, Stack, TextField, InputLabel, Button } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { useRouter } from "next/navigation";

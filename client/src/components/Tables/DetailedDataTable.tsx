@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import { Box, Button, Checkbox, Chip, Grid, Link, Menu, MenuItem, TextField, Popover, FormControlLabel, FormGroup, Badge } from '@mui/material';
+import { Box, Button, Checkbox, Chip, GridLegacy as Grid, Link, Menu, MenuItem, TextField, Popover, FormControlLabel, FormGroup, Badge } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -53,7 +53,7 @@ export default function DetailedDataTable({ data, selectedRows, isSearchable = f
     const [page, setPage] = useState(0);
     const [selected, setSelected] = useState<string[]>(selectedRows ? selectedRows.map(row => row.id) : []);
     const [sortState, setSortState] = useState<{ field: string, direction: 'asc' | 'desc' } | null>(null);
-    const prevDataRef = useRef<TableData | undefined>();
+    const prevDataRef = useRef<TableData | undefined>(undefined);
     const [selectAll, setSelectAll] = useState(false);
     const [columnFilters, setColumnFilters] = useState<{ [key: string]: string[] }>({});
     const [filterAnchorEl, setFilterAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});

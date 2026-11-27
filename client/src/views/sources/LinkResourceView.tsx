@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Typography, Stack, TextField, InputLabel, Button, FormControl, MenuItem } from "@mui/material";
+import { GridLegacy as Grid, Typography, Stack, TextField, InputLabel, Button, FormControl, MenuItem } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { LINK_RESOURCE_TYPES } from '@/constants/';

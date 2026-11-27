@@ -1,10 +1,16 @@
 'use client';
-import React from 'react';
+import React, { use } from 'react';
 import GenericJsonForm from '@/views/generic/GenericJsonFormView';
 import { MapSettingService } from '@/api';
 import { MapSettingDto } from "@/shared/interfaces/dtos";
 
-export default function MapSettingEditPage({ params: { id } }: { params: { id: string } }) {
+export default function MapSettingEditPage(props: { params: Promise<{ id: string }> }) {
+    const params = use(props.params);
+
+    const {
+        id
+    } = params;
+
     const initialContent = { Example: 'Example' };
 
     const dtoMapper = (title: string, jsonContent: object, id?: string): MapSettingDto => ({

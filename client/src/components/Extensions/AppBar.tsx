@@ -1,4 +1,4 @@
-import { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar/AppBar";
+import { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
 import MuiAppBar from "@mui/material/AppBar";
 import { DRAWER_WIDTH } from '@/constants/';

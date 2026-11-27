@@ -36,8 +36,8 @@ async function getRequestInit(url: string): Promise<RequestInit | undefined> {
   if (AUTHENTICATED_PREFIXES.some((prefix) => url.startsWith(prefix))) {
     const jwt = await getToken({
       req: {
-        cookies: cookies(),
-        headers: headers(),
+        cookies: await cookies(),
+        headers: await headers(),
       } as any
     });
     if (!jwt || jwt.access_token === null || jwt.access_token === undefined) {

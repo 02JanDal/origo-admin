@@ -1,5 +1,5 @@
 import DetailedDataTable from "@/components/Tables/DetailedDataTable";
-import { Box, Grid, Button } from "@mui/material";
+import { Box, GridLegacy as Grid, Button } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { MapInstanceService as service } from '@/api';
 import { mapDataToTableFormat } from "@/utils/mappers/toDataTable";

@@ -1,5 +1,5 @@
 import { Column, DataRow } from "@/interfaces";
-import { Button, Grid, Switch, TextField, Typography } from "@mui/material";
+import { Button, GridLegacy as Grid, Switch, TextField, Typography } from "@mui/material";
 import { useForm, Controller } from "react-hook-form"
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';

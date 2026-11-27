@@ -7,7 +7,7 @@ import {
     Button,
     Box,
     Typography,
-    Grid,
+    GridLegacy as Grid,
     ListItemButton,
     ListSubheader,
     Stack,

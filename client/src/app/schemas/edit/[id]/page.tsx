@@ -1,7 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import {
-    Grid,
+    GridLegacy as Grid,
     Typography,
     TextField,
     Button,
@@ -19,12 +19,13 @@ import JSONEditorReact from "@/components/Editors/JSONEditor";
 import { globalEventEmitter } from "@/utils/EventEmitter";
 
 interface EditSchemaPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
-export default function EditSchemaPage({ params }: EditSchemaPageProps) {
+export default function EditSchemaPage(props: EditSchemaPageProps) {
+    const params = use(props.params);
     const router = useRouter();
     const { showToast } = useApp();
 

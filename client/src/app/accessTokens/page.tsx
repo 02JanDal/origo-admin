@@ -1,5 +1,5 @@
 'use client';
-import { Grid, Typography, Button } from "@mui/material";
+import { GridLegacy as Grid, Typography, Button } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { useRouter, usePathname } from "next/navigation";

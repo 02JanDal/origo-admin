@@ -1,5 +1,5 @@
 import { MediaDto } from "@/shared/interfaces/dtos";
-import { Box, Button, Grid, InputAdornment, TextField, Tooltip, Typography, styled } from "@mui/material";
+import { Box, Button, GridLegacy as Grid, InputAdornment, TextField, Tooltip, Typography, styled } from "@mui/material";
 import { useEffect, useState } from "react";
 import {
     CloudUpload as CloudUploadIcon,

@@ -1,4 +1,5 @@
-'use client';
+'use client';;
+import { use } from "react";
 import { useRouter } from "next/navigation";
 import { LinkResourceService as service } from '@/api';
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -6,7 +7,13 @@ import LinkResourceForm from '@/views/sources/LinkResourceView';
 import { LinkResourceDto } from "@/shared/interfaces/dtos";
 import { useApp } from "@/contexts/AppContext";
 
-export default function EditPage({ params: { id } }: any) {
+export default function EditPage(props: { params: Promise<{ id: string }> }) {
+    const params = use(props.params);
+
+    const {
+        id
+    } = params;
+
     const router = useRouter();
     const { showToastAfterNavigation, showToast } = useApp();
     const queryKey = 'linkResource';

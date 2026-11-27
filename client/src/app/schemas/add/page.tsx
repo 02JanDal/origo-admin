@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import {
-    Grid,
+    GridLegacy as Grid,
     Typography,
     TextField,
     Button,

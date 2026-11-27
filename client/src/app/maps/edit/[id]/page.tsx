@@ -2,7 +2,7 @@
 import { Box } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import React from "react";
 import Controls from "@/views/maps/Controls";
 import { LayersEditor } from "@/components/Editors/LayersEditor/LayersEditor";
@@ -27,7 +27,13 @@ interface Item {
     label: string;
 }
 
-export default function Page({ params: { id } }: any) {
+export default function Page(props: { params: Promise<{ id: string }> }) {
+    const params = use(props.params);
+
+    const {
+        id
+    } = params;
+
     const queryKey = "map";
     const { data } = useQuery({ queryKey: [queryKey], queryFn: () => service.fetch(id) });
     const [value, setValue] = React.useState(items[0].id);

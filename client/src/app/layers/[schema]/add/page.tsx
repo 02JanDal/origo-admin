@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Container, Paper, Alert, CircularProgress, Typography } from '@mui/material';
 import { JSONSchemaForm } from '@/components/Forms/JSONSchemaForm';
@@ -10,12 +10,13 @@ import { createGenericLayerService } from '@/api/genericLayerService';
 import { useApp } from "@/contexts/AppContext";
 
 interface DynamicSchemaPageProps {
-  params: {
+  params: Promise<{
     schema: string;
-  };
+  }>;
 }
 
-export default function DynamicSchemaPage({ params }: DynamicSchemaPageProps) {
+export default function DynamicSchemaPage(props: DynamicSchemaPageProps) {
+  const params = use(props.params);
   const router = useRouter();
   const [schema, setSchema] = useState<ExtendedJSONSchema | null>(null);
   const [loading, setLoading] = useState(true);

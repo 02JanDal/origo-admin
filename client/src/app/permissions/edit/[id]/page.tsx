@@ -1,10 +1,10 @@
 'use client';
-import { Grid, Typography, Stack, TextField, InputLabel, Button, FormControl, FormControlLabel, Radio, RadioGroup, Box } from "@mui/material";
+import { GridLegacy as Grid, Typography, Stack, TextField, InputLabel, Button, FormControl, FormControlLabel, Radio, RadioGroup, Box } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { useRouter } from "next/navigation";
 import { PermissionService as service } from '@/api';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import GenericTable from "@/components/Tables/GenericTable";
 import FormDialog from "@/components/Dialogs/FormDialog";
@@ -33,7 +33,13 @@ import mapInstanceSpec from "@/assets/specifications/tables/mapInstanceTableSpec
 import { MapInstanceService as mapInstanceService } from '@/api';
 import { useApp } from "@/contexts/AppContext";
 
-export default function Page({ params: { id } }: any) {
+export default function Page(props: { params: Promise<{ id: string }> }) {
+    const params = use(props.params);
+
+    const {
+        id
+    } = params;
+
     const key = "permissions";
     const { data, } = useQuery({ queryKey: [key, id], queryFn: () => service.fetch(id) });
     const { showToast, showToastAfterNavigation } = useApp();

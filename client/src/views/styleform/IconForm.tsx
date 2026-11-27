@@ -1,6 +1,6 @@
 import { MediaSelector } from "@/components/Selects/MediaSelector";
 import { IconStyleDto } from "@/shared/interfaces/dtos";
-import { Typography, Divider, Grid, InputLabel, TextField, Switch } from "@mui/material";
+import { Typography, Divider, GridLegacy as Grid, InputLabel, TextField, Switch } from "@mui/material";
 import { ChangeEvent } from "react";
 
 interface RenderIconFormProps {

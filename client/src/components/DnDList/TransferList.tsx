@@ -1,5 +1,5 @@
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
-import { Button, Grid, Stack } from '@mui/material';
+import { Button, GridLegacy as Grid, Stack } from '@mui/material';
 
 import React, { useEffect, useState } from 'react';
 import HoverCard from '../Cards/HoverCard/HoverCard';

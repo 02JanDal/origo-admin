@@ -1,6 +1,6 @@
 import JSONEditor from "@/components/Editors/JSONEditor";
 import { CustomStyleDto } from "@/shared/interfaces/dtos";
-import { Typography, Divider, Grid } from "@mui/material";
+import { Typography, Divider, GridLegacy as Grid } from "@mui/material";
 
 interface RenderCustomFormProps {
     selectedCustomStyle: CustomStyleDto;

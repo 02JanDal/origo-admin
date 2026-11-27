@@ -1,5 +1,5 @@
 'use client';
-import { Backdrop, CircularProgress, Grid, TextField, Typography } from "@mui/material";
+import { Backdrop, CircularProgress, GridLegacy as Grid, TextField, Typography } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { useRouter, usePathname } from "next/navigation";

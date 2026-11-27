@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   Button,
-  Grid,
+  GridLegacy as Grid,
   Typography,
   CircularProgress,
   Alert,

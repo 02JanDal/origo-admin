@@ -1,5 +1,5 @@
 import { LinkResourceDto } from '@/shared/interfaces/dtos';
-import { Button, Divider, FormControl, Grid, MenuItem, TextField, Typography } from '@mui/material';
+import { Button, Divider, FormControl, GridLegacy as Grid, MenuItem, TextField, Typography } from '@mui/material';
 import React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import DetailedDataTable from '@/components/Tables/DetailedDataTable';

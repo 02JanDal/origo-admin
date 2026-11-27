@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Stepper, Step, StepLabel, Button, Grid } from "@mui/material";
+import { Stepper, Step, StepLabel, Button, GridLegacy as Grid } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { DataRow, TableData } from "@/interfaces";

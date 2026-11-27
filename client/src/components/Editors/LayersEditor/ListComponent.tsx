@@ -1,7 +1,7 @@
 import { GroupDto, LayerDto } from "@/shared/interfaces/dtos";
 import { getIcon } from "@/utils/helpers/iconHelper";
 import { ExpandLess, ExpandMore } from "@mui/icons-material";
-import { Divider, ListItemButton, ListItemText, Box, IconButton, Collapse, List, Grid, Paper, ListSubheader, Typography } from "@mui/material";
+import { Divider, ListItemButton, ListItemText, Box, IconButton, Collapse, List, GridLegacy as Grid, Paper, ListSubheader, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 

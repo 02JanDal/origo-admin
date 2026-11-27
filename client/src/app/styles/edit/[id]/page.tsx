@@ -1,11 +1,17 @@
 'use client';
-import React, { } from 'react';
+import React, { use } from 'react';
 import styles from "@/app/page.module.css";
 import { useRouter } from "next/navigation";
-import { Grid, Typography } from '@mui/material';
+import { GridLegacy as Grid, Typography } from '@mui/material';
 import { StyleEditor } from '@/components/Editors/StyleEditor';
 
-export default function Page({ params: { id } }: any) {
+export default function Page(props: { params: Promise<{ id: string }> }) {
+    const params = use(props.params);
+
+    const {
+        id
+    } = params;
+
     const router = useRouter();
 
     const handleCancelClick = () => {

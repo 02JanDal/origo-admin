@@ -1,5 +1,5 @@
 'use client';
-import { Grid, Typography, Button, ImageList, ImageListItem, styled, CardContent, Box } from "@mui/material";
+import { GridLegacy as Grid, Typography, Button, ImageList, ImageListItem, styled, CardContent, Box } from "@mui/material";
 import MainCard from "@/components/Cards/MainCard/MainCard";
 import styles from "@/app/page.module.css";
 import { MediaSelector } from "@/components/Selects/MediaSelector";
