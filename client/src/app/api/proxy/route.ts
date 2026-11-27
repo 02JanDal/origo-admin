@@ -2,6 +2,18 @@ import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import { ActorDto } from "@/shared/interfaces/dtos";
 import { userInfoService } from "@/lib/auth/userInforService";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("proxy");
+
+const describeUrl = (url: string) => {
+  try {
+    const { origin, pathname } = new URL(url);
+    return `${origin}${pathname}`;
+  } catch {
+    return "<invalid url>";
+  }
+};
 
 const API_ACCESS_TOKEN = process.env.PROTECTED_API_ACCESS_TOKEN;
 const ADMIN_ROLE = process.env.PROTECTED_ADMIN_ROLE;
@@ -43,24 +55,25 @@ async function handler(req: NextRequest) {
       headers["X-User-Info"] = JSON.stringify(userInfo.username);
 
       if (!roleInfo || !roleInfo.actors || roleInfo.actors.length === 0) {
-        console.warn(`[${new Date().toISOString()}] Warning: Empty role info, granting access, make sure to add the ADMIN Role to permissions!`);
+        log.warn("Empty role info, granting access, make sure to add the ADMIN Role to permissions!");
       } else {
         const hasAccess = roleInfo.actors.some(
           (actor: ActorDto) => (actor.type === "Group" && userGroups.includes(actor.name)) || (actor.type === "User" && actor.name === userInfo.username)
         );
 
         if (!hasAccess) {
-          console.error(`[${new Date().toISOString()}] Error in authentication process: User not authorized`);
+          log.warn("Authentication failed: user not authorized", { user: userInfo.username });
           return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/auth/signin`, req.url));
         }
       }
     } catch (error) {
-      console.error(`[${new Date().toISOString()}] Error in authentication process: User not authorized (${error})`);
+      log.error("Error in authentication process: user not authorized", error);
       return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/auth/signin`, req.url));
     }
   }
 
   try {
+    const upstreamStart = Date.now();
     let response: Response;
 
     if (method === "GET" || method === "DELETE") {
@@ -85,6 +98,11 @@ async function handler(req: NextRequest) {
       return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
     }
 
+    log.access(`${method} ${describeUrl(url)} -> ${response.status}`, { upstream: true, durationMs: Date.now() - upstreamStart });
+    if (!response.ok) {
+      log.warn(`Upstream ${method} ${describeUrl(url)} responded ${response.status} ${response.statusText}`);
+    }
+
     if (
       (response.status === 204 && response.headers.get("Content-Length") === "0") ||
       response.headers.get("Content-Length") === null ||
@@ -102,7 +120,7 @@ async function handler(req: NextRequest) {
       return new NextResponse(text, { status: response.status });
     }
   } catch (error) {
-    console.error(`[${new Date().toISOString()}] Proxy error: ${error}`);
+    log.error(`Proxy error for ${method} ${describeUrl(url)}`, error);
     if (error instanceof Error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
@@ -112,7 +130,7 @@ async function handler(req: NextRequest) {
 
 async function getRoleInfo(roleName: string) {
   const roleUrl = `${BASE_URL}${ROLE_ROUTE}${roleName}`;
-  console.log(`Fetching role info from: ${roleUrl}`);
+  log.debug(`Fetching role info from: ${roleUrl}`);
   const response = await fetch(roleUrl, {
     headers: {
       Authorization: `Bearer ${API_ACCESS_TOKEN}`,

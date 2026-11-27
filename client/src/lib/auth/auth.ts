@@ -1,5 +1,8 @@
 import jwt, { Algorithm } from "jsonwebtoken";
 import jwksClient, { JwksClient } from "jwks-rsa";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("auth");
 
 export function isJwt(token: string): boolean {
   return token.split(".").length === 3;
@@ -67,7 +70,7 @@ export async function verifyAndDecodeIdpToken(token: string): Promise<jwt.JwtPay
   try {
     const decoded = jwt.decode(token, { complete: true });
     if (!decoded || typeof decoded === "string" || !decoded.header.kid) {
-      console.warn(`[${new Date().toISOString()}] JWT is missing a 'kid' header; cannot verify`);
+      log.warn("JWT is missing a 'kid' header; cannot verify");
       return null;
     }
 
@@ -81,7 +84,7 @@ export async function verifyAndDecodeIdpToken(token: string): Promise<jwt.JwtPay
     });
     return typeof payload === "string" ? null : payload;
   } catch (error) {
-    console.warn(`[${new Date().toISOString()}] JWT verification failed:`, error);
+    log.warn("JWT verification failed", error);
     return null;
   }
 }

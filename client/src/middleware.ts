@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { createLogger } from "@/lib/logger-edge";
+
+const log = createLogger("middleware");
+
+const logAccess = (req: NextRequest, outcome: string) => {
+  if (req.nextUrl.pathname.includes("/_next/")) return;
+  log.access(`${req.method} ${req.nextUrl.pathname} ${outcome}`, {
+    ip: req.headers.get("x-forwarded-for")?.split(",")[0].trim(),
+    userAgent: req.headers.get("user-agent") ?? undefined,
+  });
+};
 
 export async function middleware(req: NextRequest) {
   const authEnabled = process.env.AUTH_ENABLED === "true";
@@ -18,9 +29,12 @@ export async function middleware(req: NextRequest) {
     });
 
     if (!token || token.error === "RefreshAccessTokenError") {
+      log.debug(`Unauthenticated request to ${pathname}, redirecting to sign in`, { reason: token?.error ?? "no session" });
+      logAccess(req, "redirect-to-signin");
       return NextResponse.redirect(new URL(`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/api/auth/signin`, req.url));
     }
   }
+  logAccess(req, "allowed");
   return NextResponse.next();
 }
 

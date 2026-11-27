@@ -1,5 +1,8 @@
 import { UserInfo, UserInfoCache } from "./userInfoCache";
 import { isJwt, verifyAndDecodeIdpToken, extractGroupsFromClaims, extractUsernameFromClaims } from "./auth";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("auth");
 
 interface WellKnownConfig {
   userinfo_endpoint: string;
@@ -69,7 +72,7 @@ export class UserInfoService {
           username: extractUsernameFromClaims(claims),
         };
       }
-      console.warn(`[${new Date().toISOString()}] JWT verification failed; falling back to userinfo endpoint`);
+      log.warn("JWT verification failed; falling back to userinfo endpoint");
     }
 
     const wellKnownConfig = await this.getWellKnownConfig();

@@ -1,5 +1,8 @@
 import axios from "axios";
 import { JWT } from "next-auth/jwt";
+import { createLogger } from "@/lib/logger";
+
+const log = createLogger("auth");
 
 type RefreshTokenResponse = {
   access_token?: string;
@@ -52,14 +55,14 @@ async function requestNewTokens(refreshToken: string, scope: string, access_toke
     });
 
     const data = response.data;
-    console.info(`[${new Date().toISOString()}] [auth] Access token refreshed (expires in ${data.expires_in ?? "unknown"}s)`);
+    log.info(`Access token refreshed (expires in ${data.expires_in ?? "unknown"}s)`);
     return {
       access_token: data.access_token,
       refresh_token: data.refresh_token,
       expires_in: data.expires_in,
     };
   } catch (error: any) {
-    console.error(`[${new Date().toISOString()}] Error refreshing OAuth token: ${error}`);
+    log.error("Error refreshing OAuth token", error);
     let errorMessage = "An unknown error occurred";
     let fatal = false;
     if (axios.isAxiosError(error)) {
